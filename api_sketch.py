@@ -40,7 +40,7 @@ def train_generator(task_id: str, input_data: np.nditer, batch_size: int, privac
                     push: bool = True,
                     latent_dim: tuple[int] = (),
                     latent_dist: str = "normal",
-                    readme: str,
+                    readme: str = None,
                     ) -> (str, str):
     """
     Returns a data generator given a set of user samples for a specific task.

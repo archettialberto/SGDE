@@ -37,7 +37,7 @@ if __name__ == "__main__":
 
     resp = query_api("exchange/generators/upload",
                      headers={"Authorization": f"Bearer {token}"},
-                     data={"task_name": "MNIST", "generator_name": "CNN", "onnx": "onnx_content"},
+                     data={"task_name": "MNIST", "generator_name": "gen_CNN", "onnx": "onnx_content"},
                      get=False)
     print_resp(resp)
 
@@ -56,7 +56,7 @@ if __name__ == "__main__":
 
     resp = query_api("exchange/generators/download",
                      headers={"Authorization": f"Bearer {token}"},
-                     data={"task_name": "MNIST", "generator_name": "CNN"},
+                     data={"task_name": "MNIST", "generator_name": "gen_CNN"},
                      get=True)
     print_resp(resp)
     print(resp["onnx"])
