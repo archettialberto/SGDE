@@ -37,7 +37,11 @@ def get_generators(task_id: str = None) -> pd.DataFrame:
 
 # noinspection PyUnusedLocal
 def train_generator(task_id: str, input_data: np.nditer, batch_size: int, privacy_level: str, distribute: bool = False,
-                    push: bool = True) -> (str, str):
+                    push: bool = True,
+                    latent_dim: tuple[int] = (),
+                    latent_dist: str = "normal",
+                    readme: str,
+                    ) -> (str, str):
     """
     Returns a data generator given a set of user samples for a specific task.
 
@@ -69,7 +73,7 @@ def pull_generator(generator_id: str) -> str:
 
 
 # noinspection PyUnusedLocal
-def generate_data(generator: str, num_samples: int = 1) -> np.nditer:
+def generate_data(generator: str, num_samples: int = 1, remote: bool = False) -> np.nditer:
     """
     Generates some samples from a generator.
 
