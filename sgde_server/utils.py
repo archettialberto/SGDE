@@ -75,41 +75,37 @@ def check_correct_password(true_password: str, password: str):
         raise APIException(400, "Incorrect password")
 
 
-def check_username_is_new(username: str):
-    if User.query.filter_by(username=username).first():
-        raise APIException(400, "'username' already exists")
-
-
-def check_task_name_is_new(task_name: str):
-    if Task.query.filter_by(name=task_name).first():
-        raise APIException(400, "'task_name' already exists")
-
-
-def check_generator_name_is_new(generator_name: str, task_id: int):
-    generator_same_name = Generator.query.filter(Generator.task_id == task_id, Generator.name == generator_name).first()
-    if generator_same_name:
-        raise APIException(400, "'generator_name' already exists for task 'task_name'")
-
-
 def get_user(username: str, exists=True):
     user = User.query.filter_by(username=username).first()
-    if exists:
-        if not user:
-            raise APIException(400, "'username' does not exist")
+    if exists and not user:
+        raise APIException(400, "'username' does not exist")
     return user
 
 
 def get_task(task_name: str, exists=True):
     task = Task.query.filter_by(name=task_name).first()
-    if exists:
-        if not task:
-            raise APIException(400, "'task_name' does not exist")
+    if exists and not task:
+        raise APIException(400, "'task_name' does not exist")
     return task
 
 
 def get_generator(generator_name: str, task_id: int, exists=True):
     generator = Generator.query.filter_by(name=generator_name, task_id=task_id).first()
-    if exists:
-        if not generator:
-            raise APIException(400, f"'generator_name' does not exist for 'task_name'")
+    if exists and not generator:
+        raise APIException(400, f"'generator_name' does not exist for 'task_name'")
     return generator
+
+
+def check_username_is_new(username: str):
+    if get_user(username, exists=False):
+        raise APIException(400, "'username' already exists")
+
+
+def check_task_name_is_new(task_name: str):
+    if get_task(task_name, exists=False):
+        raise APIException(400, "'task_name' already exists")
+
+
+def check_generator_name_is_new(generator_name: str, task_id: int):
+    if get_generator(generator_name, task_id, exists=False):
+        raise APIException(400, "'generator_name' already exists for task 'task_name'")
