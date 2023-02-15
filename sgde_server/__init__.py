@@ -1,13 +1,16 @@
-import json
+import yaml
 import os
 from pathlib import Path
 
 from flask import Flask
 
 
-def create_app(config_filename=None):
-    app = Flask(__name__)
-    app.config.from_file(Path(app.root_path, "default_config.json"), json.load)
+def create_app(config_filename=None, instance_path=None):
+    if instance_path is not None:
+        app = Flask(__name__, instance_path=instance_path)
+    else:
+        app = Flask(__name__)
+    app.config.from_file(Path(app.root_path, "default_config.yml"), yaml.safe_load)
 
     from sgde_server.db import db
     db.init_app(app)
@@ -22,10 +25,10 @@ def create_app(config_filename=None):
     app.register_blueprint(exchange)
 
     if config_filename:
-        app.config.from_json(Path(config_filename))
+        app.config.from_file(Path(config_filename), yaml.safe_load)
 
     os.makedirs(app.instance_path, exist_ok=True)
-    with open(Path(app.instance_path, "config.json"), 'w') as f:
-        json.dump(dict(app.config), f, indent=2, default=str)
+    with open(Path(app.instance_path, "config.yml"), 'w') as f:
+        yaml.dump(dict(app.config), f)
 
     return app
