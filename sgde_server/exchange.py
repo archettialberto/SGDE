@@ -5,9 +5,9 @@ from pathlib import Path
 from flask import Blueprint, jsonify, request, current_app
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
-from .utils import get_field_from_request, safe_exception_raise, check_str_len, check_task_name_is_new, get_task, \
-    check_generator_name_is_new, query_to_dict, get_generator
-from .db import db, User, Task, Generator
+from sgde_server.utils import get_field_from_request, safe_exception_raise, check_str_len, check_task_name_is_new, \
+    get_task, check_generator_name_is_new, query_to_dict, get_generator
+from sgde_server.db import db, User, Task, Generator
 
 exchange = Blueprint("exchange", __name__, url_prefix="/exchange")
 

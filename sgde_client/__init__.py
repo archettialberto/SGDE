@@ -1,1 +1,1 @@
-from .auth import login, register
+from sgde_client.auth import login, register

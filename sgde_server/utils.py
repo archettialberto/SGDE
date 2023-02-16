@@ -4,9 +4,9 @@ from flask import jsonify, Request
 from flask_bcrypt import check_password_hash
 from flask_sqlalchemy.query import Query
 
-from .exceptions import APIException, MissingFieldException, InvalidFormatException, IncorrectPasswordException, \
-    DoesNotExistException, AlreadyExistsException
-from .db import User, Task, Generator
+from sgde_server.exceptions import APIException, MissingFieldException, InvalidFormatException, \
+    IncorrectPasswordException, DoesNotExistException, AlreadyExistsException
+from sgde_server.db import User, Task, Generator
 
 
 def query_to_dict(query: Query, columns: list[str]) -> dict[str, list]:

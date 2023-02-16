@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from sgde_server.exceptions import MissingFieldException, InvalidFormatException, AlreadyExistsException
+from sgde_server.exceptions import MissingFieldException, InvalidFormatException, AlreadyExistsException, APIException
 from sgde_server import create_app
 
 
@@ -20,8 +20,8 @@ def client(app):
     return app.test_client()
 
 
-def check_response(resp, code, msg):
-    assert resp.status_code == code and resp.json["msg"] == msg
+def check_exception(resp, exception: APIException):
+    assert resp.status_code == exception.status_code and resp.json["msg"] == exception.msg
 
 
 def test_task_exchange(app, client):
@@ -43,16 +43,16 @@ def test_task_exchange(app, client):
 
     resp = client.post("/exchange/tasks", headers={"Authorization": f"Bearer {token}"},
                        data={})
-    check_response(resp, 400, MissingFieldException("task_name").msg)
+    check_exception(resp, MissingFieldException("task_name"))
 
     resp = client.post("/exchange/tasks", headers={"Authorization": f"Bearer {token}"},
                        data={"task_name": "t"})
-    check_response(resp, 400, InvalidFormatException("task_name", InvalidFormatException.TOO_SHORT).msg)
+    check_exception(resp, InvalidFormatException("task_name", InvalidFormatException.TOO_SHORT))
 
     long_task_name = 'foo' * app.config['MAX_TASK_NAME_LENGTH']
     resp = client.post("/exchange/tasks", headers={"Authorization": f"Bearer {token}"},
                        data={"task_name": f"{long_task_name}"})
-    check_response(resp, 400, InvalidFormatException("task_name", InvalidFormatException.TOO_LONG).msg)
+    check_exception(resp, InvalidFormatException("task_name", InvalidFormatException.TOO_LONG))
 
     resp = client.post("/exchange/tasks", headers={"Authorization": f"Bearer {token}"},
                        data={"task_name": "sample_task"})
@@ -63,7 +63,7 @@ def test_task_exchange(app, client):
 
     resp = client.post("/exchange/tasks", headers={"Authorization": f"Bearer {token}"},
                        data={"task_name": "sample_task"})
-    check_response(resp, 400, AlreadyExistsException("task_name").msg)
+    check_exception(resp, AlreadyExistsException("task_name"))
 
 
 def generator_exchange(app, client):

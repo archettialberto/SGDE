@@ -1,7 +1,7 @@
 import os
 from getpass import getpass
 
-from .utils import send_request, ask_credentials, safe_exception_raise_on_client
+from sgde_client.utils import send_request, ask_credentials, safe_exception_raise_on_client
 
 
 @safe_exception_raise_on_client
