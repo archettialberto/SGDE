@@ -1,7 +1,7 @@
 import re
 
+import bcrypt
 from flask import jsonify, Request
-from flask_bcrypt import check_password_hash
 from flask_sqlalchemy.query import Query
 
 from sgde_server.exceptions import APIException, MissingFieldException, InvalidFormatException, \
@@ -64,8 +64,8 @@ def check_valid_password(password: str, min_len: int, max_len: int):
         raise InvalidFormatException("password", InvalidFormatException.PWD_CONTAIN_SYMBOL)
 
 
-def check_correct_password(true_password: str, password: str):
-    if not check_password_hash(true_password, password):
+def check_correct_password(password_from_client: str, password_from_db: bytes):
+    if not bcrypt.checkpw(password_from_client.encode('utf-8'), password_from_db):
         raise IncorrectPasswordException()
 
 

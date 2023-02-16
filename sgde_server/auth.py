@@ -1,7 +1,7 @@
 import datetime
 
+import bcrypt
 from flask import Blueprint, request, jsonify, current_app
-from flask_bcrypt import generate_password_hash
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 
 from sgde_server.utils import get_field_from_request, check_valid_username, safe_exception_raise, \
@@ -23,8 +23,9 @@ def register():
 
     check_username_is_new(username)
 
+    hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
     # noinspection PyArgumentList
-    user = User(username=username, password=generate_password_hash(password))
+    user = User(username=username, password=hashed_password)
     db.session.add(user)
     db.session.commit()
     return jsonify(msg="User created successfully"), 201
@@ -41,7 +42,7 @@ def login():
 
     user = get_user(username)
 
-    check_correct_password(user.password, password)
+    check_correct_password(password, user.password)
 
     valid_for_sec = current_app.config["TOKEN_EXPIRATION_SECONDS"]
     valid_until = datetime.datetime.utcnow() + datetime.timedelta(seconds=valid_for_sec)
