@@ -65,7 +65,6 @@ def get_generators():
     ), 200
 
 
-# TODO handle chunks
 @exchange.route("generators/upload", methods=["POST"])
 @jwt_required()
 @safe_exception_raise
@@ -78,7 +77,7 @@ def upload_generator():
     min_len, max_len = current_app.config["MIN_GENERATOR_NAME_LENGTH"], current_app.config["MAX_GENERATOR_NAME_LENGTH"]
     check_str_len(generator_name, "generator_name", min_len, max_len)
 
-    onnx = get_field_from_request(request, "onnx")
+    onnx_data = get_field_from_request(request, "onnx")
 
     task = get_task(task_name)
     check_generator_name_is_new(generator_name, task.id)
@@ -87,7 +86,7 @@ def upload_generator():
 
     filename = str(uuid.uuid4())
     with open(Path(current_app.instance_path, "tasks", task.directory, f"{filename}.onnx"), 'w') as f:
-        f.write(onnx)
+        f.write(onnx_data)
     # noinspection PyArgumentList
     generator = Generator(name=generator_name, filename=filename, task_id=task.id, user_id=user.id)
     db.session.add(generator)
@@ -95,7 +94,6 @@ def upload_generator():
     return jsonify(msg="Generator uploaded successfully"), 201
 
 
-# TODO look for a better send/receive function
 @exchange.route("/generators/download", methods=["GET"])
 @jwt_required()
 @safe_exception_raise
@@ -111,6 +109,7 @@ def download_generator():
     task = get_task(task_name)
     generator = get_generator(generator_name, task.id)
 
-    with open(Path(current_app.instance_path, "tasks", task.directory, f"{generator.filename}.onnx"), 'r') as f:
-        onnx = f.read()
-    return jsonify(msg="Generator downloaded successfully", onnx=onnx), 200
+    file_path = Path(current_app.instance_path, "tasks", task.directory, f"{generator.filename}.onnx")
+    with open(file_path, 'r') as f:
+        onnx_data = f.read()
+    return jsonify(msg="Generator downloaded successfully", onnx=onnx_data), 200

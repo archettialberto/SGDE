@@ -1,4 +1,5 @@
 import os
+import shutil
 from pathlib import Path
 
 import pytest
@@ -13,7 +14,7 @@ def app():
     app = create_app(instance_path=Path(os.getcwd(), "test_instance"))
     app.config.update({"TESTING": True})
     yield app
-    os.system(f"rm -rf {app.instance_path}")
+    shutil.rmtree(app.instance_path)
 
 
 @pytest.fixture()

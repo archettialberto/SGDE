@@ -86,7 +86,7 @@ def get_task(task_name: str, exists=True):
 def get_generator(generator_name: str, task_id: int, exists=True):
     generator = Generator.query.filter_by(name=generator_name, task_id=task_id).first()
     if exists and not generator:
-        raise DoesNotExistException("generator_name'+'task_name")
+        raise DoesNotExistException("task_name'+'generator_name")
     return generator
 
 
@@ -102,4 +102,4 @@ def check_task_name_is_new(task_name: str):
 
 def check_generator_name_is_new(generator_name: str, task_id: int):
     if get_generator(generator_name, task_id, exists=False):
-        raise AlreadyExistsException("generator_name'+'task_name")
+        raise AlreadyExistsException("task_name'+'generator_name")

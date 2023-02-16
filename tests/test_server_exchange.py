@@ -1,9 +1,11 @@
 import os
+import shutil
 from pathlib import Path
 
 import pytest
 
-from sgde_server.exceptions import MissingFieldException, InvalidFormatException, AlreadyExistsException, APIException
+from sgde_server.exceptions import MissingFieldException, InvalidFormatException, AlreadyExistsException, \
+    APIException, DoesNotExistException
 from sgde_server import create_app
 
 
@@ -12,7 +14,7 @@ def app():
     app = create_app(instance_path=Path(os.getcwd(), "test_instance"))
     app.config.update({"TESTING": True})
     yield app
-    os.system(f"rm -rf {app.instance_path}")
+    shutil.rmtree(app.instance_path)
 
 
 @pytest.fixture()
@@ -66,6 +68,37 @@ def test_task_exchange(app, client):
     check_exception(resp, AlreadyExistsException("task_name"))
 
 
-def generator_exchange(app, client):
-    # TODO implement these tests
-    pass
+def test_generator_exchange(app, client):
+    resp = client.post("/auth/register", data={"username": "foo_bar", "password": "aaaaAAAA1111!"})
+    assert resp.status_code == 201
+
+    resp = client.post("/auth/login", data={"username": "foo_bar", "password": "aaaaAAAA1111!"})
+    assert resp.status_code == 201
+    token = resp.json["access_token"]
+
+    resp = client.get("/exchange/generators")
+    assert resp.status_code == 401 and "Missing Authorization Header" == resp.json["msg"]
+
+    resp = client.get("/exchange/generators", headers={"Authorization": f"Bearer {token}"})
+    check_exception(resp, MissingFieldException("task_name"))
+
+    resp = client.get("/exchange/generators", headers={"Authorization": f"Bearer {token}"},
+                      data={"task_name": "t"})
+    check_exception(resp, InvalidFormatException("task_name", InvalidFormatException.TOO_SHORT))
+
+    long_task_name = 'foo' * app.config['MAX_TASK_NAME_LENGTH']
+    resp = client.get("/exchange/generators", headers={"Authorization": f"Bearer {token}"},
+                      data={"task_name": f"{long_task_name}"})
+    check_exception(resp, InvalidFormatException("task_name", InvalidFormatException.TOO_LONG))
+
+    resp = client.get("/exchange/generators", headers={"Authorization": f"Bearer {token}"},
+                      data={"task_name": "Non-existent task"})
+    check_exception(resp, DoesNotExistException("task_name"))
+
+    resp = client.post("/exchange/tasks", headers={"Authorization": f"Bearer {token}"},
+                       data={"task_name": "sample_task"})
+    assert resp.status_code == 201
+
+    resp = client.get("/exchange/generators", headers={"Authorization": f"Bearer {token}"},
+                      data={"task_name": "sample_task"})
+    assert resp.status_code == 200 and resp.json["generators"] == {"creator": [], "generator_name": []}
