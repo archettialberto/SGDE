@@ -28,7 +28,6 @@ def safe_exception_raise(fn):
     return wrapper_fn
 
 
-# TODO type check?
 def get_field_from_request(request: Request, field_name: str, required=True):
     username = request.form.get(field_name)
     if required:
