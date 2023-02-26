@@ -30,7 +30,7 @@ def send_request(method: str, authenticate: bool = False):
 
             uri, data = fn(*args, **kwargs)
 
-            headers = {"Content-type": "application/json"}
+            headers = {}
 
             if authenticate:
                 if "SGDE_ACCESS_TOKEN" not in os.environ:
@@ -40,11 +40,15 @@ def send_request(method: str, authenticate: bool = False):
                 headers["Authorization"] = f"Bearer {token}"
 
             request_fn = requests.get if method == "GET" else requests.post
+            logging.info(f"[{method}] {ip}:{port}/{uri}")
             resp = request_fn(f"http://{ip}:{port}/{uri}", headers=headers, data=data)
 
-            if resp.status_code not in [200, 201]:
-                raise ResponseException(resp.status_code, resp.json()["msg"])
-            logging.info(f"[{resp.status_code}] {resp.json()['msg']}")
+            try:
+                if resp.status_code not in [200, 201]:
+                    raise ResponseException(resp.status_code, resp.json()["msg"])
+                logging.info(f"[{resp.status_code}] {resp.json()['msg']}")
+            except json.JSONDecodeError:
+                logging.error(f"[{resp.status_code}] Response not in valid JSON format")
 
             return resp
 
