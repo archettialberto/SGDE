@@ -5,7 +5,6 @@ from pathlib import Path
 from flask import Flask
 
 
-# TODO must run on HTTPS
 def create_app(config_filename=None, instance_path=None):
     if instance_path is not None:
         app = Flask(__name__, instance_path=instance_path)
