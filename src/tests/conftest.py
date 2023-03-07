@@ -11,11 +11,18 @@ from sqlalchemy.orm import sessionmaker
 from starlette.testclient import TestClient
 
 from src.auth.router import router as auth_router
+from src.config import settings, Environment
 from src.database import Base, get_db
 from src.exchange.router import router as exchange_router
 
+settings.ENVIRONMENT = Environment.TESTING
+settings.INSTANCE_PATH = os.path.join(os.getcwd(), "test_instance")
+settings.DATABASE_URL = os.path.join(os.getcwd(), "test_instance", "sgde_test_db.db")
+settings.GENERATOR_PATH = os.path.join(os.getcwd(), "test_instance", "generators")
+os.makedirs(settings.INSTANCE_PATH, exist_ok=True)
+os.makedirs(settings.GENERATOR_PATH, exist_ok=True)
 engine = create_engine(
-    f"sqlite:///{os.path.join(os.getcwd(), 'test_instance_dir', 'sgde_test_db.db')}",
+    f'sqlite:///{os.path.join(settings.INSTANCE_PATH, "sgde_test_db.db")}',
     connect_args={"check_same_thread": False}
 )
 SessionTesting = sessionmaker(autocommit=False, autoflush=False, bind=engine)
@@ -30,15 +37,15 @@ def start_application() -> FastAPI:
 
 @pytest.fixture(scope="function")
 def app():
-    os.makedirs(os.path.join(os.getcwd(), "test_instance_dir"), exist_ok=True)
+    os.makedirs(settings.INSTANCE_PATH, exist_ok=True)
+    os.makedirs(settings.GENERATOR_PATH, exist_ok=True)
     Base.metadata.create_all(engine)
     _app = start_application()
     yield _app
     Base.metadata.drop_all(engine)
-    for item in os.listdir(os.getcwd()):
-        # TODO fix paths for onnx models
+    for item in os.listdir(settings.GENERATOR_PATH):
         if item.endswith(".onnx"):
-            os.remove(os.path.join(os.getcwd(), item))
+            os.remove(os.path.join(settings.GENERATOR_PATH, item))
 
 
 @pytest.fixture(scope="function")
@@ -55,7 +62,7 @@ def db_session(app):
 @pytest.fixture(scope="session", autouse=True)
 def cleanup_db(request):
     def remove_test_dir():
-        shutil.rmtree(os.path.join(os.getcwd(), "test_instance_dir"))
+        shutil.rmtree(settings.INSTANCE_PATH)
     request.addfinalizer(remove_test_dir)
 
 

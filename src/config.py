@@ -23,7 +23,8 @@ class Environment(str, Enum):
 
 
 class Config(BaseSettings):
-    DATABASE_URL: str = "sqlite:///./sgde_db.db"
+    INSTANCE_PATH = os.path.join(os.getcwd(), "instance")
+    DATABASE_URL: str = f"sqlite:///{os.path.join(INSTANCE_PATH, 'sgde_db.db')}"
 
     JWT_ALG: str = "HS256"
     JWT_SECRET: str = "SECRET"
@@ -31,7 +32,7 @@ class Config(BaseSettings):
 
     ENVIRONMENT: Environment = Environment.DEVELOPMENT
 
-    GENERATOR_PATH: str = os.getcwd()
+    GENERATOR_PATH: str = os.path.join(os.getcwd(), "instance", "generators")
 
 
 settings = Config()
