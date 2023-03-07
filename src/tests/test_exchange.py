@@ -106,6 +106,8 @@ def test_get_non_empty_generators(client, onnx_file):
 
 
 def test_upload_generator_wrong_name(client, onnx_file):
+    # TODO add tests for generator field validation
+    # TODO test generator download
     client.post("/auth/register", json=foobar)
     response = client.post("/auth/token", data={"username": foobar["username"], "password": foobar["password"]})
     token = response.json()["access_token"]

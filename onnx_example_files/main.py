@@ -5,7 +5,7 @@ from onnx.checker import check_model
 from onnx.helper import make_tensor_value_info, make_node, make_model, make_graph
 
 if __name__ == "__main__":
-    onnx_folder = os.path.join(os.getcwd(), "test_onnx")
+    onnx_folder = os.path.join(os.getcwd())
     os.makedirs(onnx_folder, exist_ok=True)
 
     X = make_tensor_value_info('X', TensorProto.FLOAT, [None, None])
