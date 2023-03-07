@@ -1,6 +1,6 @@
 import pandas as pd
 
-from sgde_client.utils import send_request, safe_exception_raise_on_client
+from flask_sgde_client.utils import send_request, safe_exception_raise_on_client
 
 
 @send_request(method="GET", authenticate=True)

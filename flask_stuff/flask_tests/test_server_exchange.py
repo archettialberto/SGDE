@@ -4,9 +4,9 @@ from pathlib import Path
 
 import pytest
 
-from sgde_server.exceptions import MissingFieldException, InvalidFormatException, AlreadyExistsException, \
+from falsk_sgde_server.exceptions import MissingFieldException, InvalidFormatException, AlreadyExistsException, \
     APIException, DoesNotExistException
-from sgde_server import create_app
+from falsk_sgde_server import create_app
 
 
 @pytest.fixture()

@@ -4,9 +4,9 @@ import bcrypt
 from flask import Blueprint, request, jsonify, current_app
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 
-from sgde_server.utils import get_field_from_request, check_valid_username, safe_exception_raise, \
+from falsk_sgde_server.utils import get_field_from_request, check_valid_username, safe_exception_raise, \
     check_valid_password, check_username_is_new, get_user, check_correct_password
-from sgde_server.db import db, User
+from falsk_sgde_server.db import db, User
 
 auth = Blueprint("auth", __name__, url_prefix="/auth")
 jwt = JWTManager()

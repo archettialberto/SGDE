@@ -12,16 +12,16 @@ def create_app(config_filename=None, instance_path=None):
         app = Flask(__name__)
     app.config.from_file(Path(app.root_path, "default_config.yml"), yaml.safe_load)
 
-    from sgde_server.db import db
+    from falsk_sgde_server.db import db
     db.init_app(app)
     with app.app_context():
         db.create_all()
 
-    from sgde_server.auth import auth, jwt
+    from falsk_sgde_server.auth import auth, jwt
     jwt.init_app(app)
     app.register_blueprint(auth)
 
-    from sgde_server.exchange import exchange
+    from falsk_sgde_server.exchange import exchange
     app.register_blueprint(exchange)
 
     if config_filename:

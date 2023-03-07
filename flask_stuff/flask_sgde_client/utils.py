@@ -5,7 +5,7 @@ from getpass import getpass
 
 import requests
 
-from sgde_client.exceptions import ClientException, ResponseException
+from flask_sgde_client.exceptions import ClientException, ResponseException
 
 
 def ask_credentials():

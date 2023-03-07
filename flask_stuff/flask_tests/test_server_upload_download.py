@@ -7,9 +7,9 @@ from onnx import TensorProto
 from onnx.checker import check_model
 from onnx.helper import make_tensor_value_info, make_node, make_model, make_graph
 
-from sgde_server.exceptions import APIException, MissingFieldException, InvalidFormatException, DoesNotExistException, \
+from falsk_sgde_server.exceptions import APIException, MissingFieldException, InvalidFormatException, DoesNotExistException, \
     AlreadyExistsException
-from sgde_server import create_app
+from falsk_sgde_server import create_app
 
 
 @pytest.fixture()
