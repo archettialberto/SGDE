@@ -2,7 +2,7 @@ from starlette import status
 
 from src.auth.exceptions import LoginRequired
 from src.exchange.exceptions import GeneratorNotFound, GeneratorExists, InvalidONNX
-from src.exchange.schemas import DataFormat, Task, ModelSize
+from src.exchange.schemas import DataFormat, Task, ModelSize, GENERATOR_NAME_PATTERN
 
 foobar = {
     "username": "foobar",
@@ -106,14 +106,138 @@ def test_get_non_empty_generators(client, onnx_file):
 
 
 def test_upload_generator_wrong_name(client, onnx_file):
-    # TODO add tests for generator field validation
-    # TODO test generator download
     client.post("/auth/register", json=foobar)
     response = client.post("/auth/token", data={"username": foobar["username"], "password": foobar["password"]})
     token = response.json()["access_token"]
     files = {"onnx_file": onnx_file.well_formatted}
     _foo_gan = foo_gan.copy()
-    _foo_gan["name"] = "gan"
+    _foo_gan["name"] = "bad gan"
     response = client.post("/exchange/upload", headers={"Authorization": f"Bearer {token}"}, data=_foo_gan, files=files)
-    assert response.status_code == status.HTTP_201_CREATED
-    assert response.json() == _foo_gan
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert response.json()["detail"][0]["msg"] == f'string does not match regex "{GENERATOR_NAME_PATTERN.pattern}"'
+
+
+def test_upload_generator_wrong_conditioned(client, onnx_file):
+    client.post("/auth/register", json=foobar)
+    response = client.post("/auth/token", data={"username": foobar["username"], "password": foobar["password"]})
+    token = response.json()["access_token"]
+    files = {"onnx_file": onnx_file.well_formatted}
+    _foo_gan = foo_gan.copy()
+    _foo_gan["conditioned"] = "t r u e"
+    response = client.post("/exchange/upload", headers={"Authorization": f"Bearer {token}"}, data=_foo_gan, files=files)
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert response.json()["detail"][0]["msg"] == 'value could not be parsed to a boolean'
+
+
+def test_upload_generator_wrong_data_format(client, onnx_file):
+    client.post("/auth/register", json=foobar)
+    response = client.post("/auth/token", data={"username": foobar["username"], "password": foobar["password"]})
+    token = response.json()["access_token"]
+    files = {"onnx_file": onnx_file.well_formatted}
+    _foo_gan = foo_gan.copy()
+    _foo_gan["data_format"] = "time_series"
+    response = client.post("/exchange/upload", headers={"Authorization": f"Bearer {token}"}, data=_foo_gan, files=files)
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert response.json()["detail"][0]["msg"] == "value is not a valid enumeration member; " \
+                                                  "permitted: 'image', 'tabular'"
+
+
+def test_upload_generator_wrong_task(client, onnx_file):
+    client.post("/auth/register", json=foobar)
+    response = client.post("/auth/token", data={"username": foobar["username"], "password": foobar["password"]})
+    token = response.json()["access_token"]
+    files = {"onnx_file": onnx_file.well_formatted}
+    _foo_gan = foo_gan.copy()
+    _foo_gan["task"] = "segmentation"
+    response = client.post("/exchange/upload", headers={"Authorization": f"Bearer {token}"}, data=_foo_gan, files=files)
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert response.json()["detail"][0]["msg"] == "value is not a valid enumeration member; " \
+                                                  "permitted: 'classification', 'regression'"
+
+
+def test_upload_generator_wrong_num_classes(client, onnx_file):
+    client.post("/auth/register", json=foobar)
+    response = client.post("/auth/token", data={"username": foobar["username"], "password": foobar["password"]})
+    token = response.json()["access_token"]
+    files = {"onnx_file": onnx_file.well_formatted}
+    _foo_gan = foo_gan.copy()
+    _foo_gan["num_classes"] = 1
+    response = client.post("/exchange/upload", headers={"Authorization": f"Bearer {token}"}, data=_foo_gan, files=files)
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert response.json()["detail"][0]["msg"] == 'ensure this value is greater than or equal to 2'
+
+
+def test_upload_generator_wrong_model_size(client, onnx_file):
+    client.post("/auth/register", json=foobar)
+    response = client.post("/auth/token", data={"username": foobar["username"], "password": foobar["password"]})
+    token = response.json()["access_token"]
+    files = {"onnx_file": onnx_file.well_formatted}
+    _foo_gan = foo_gan.copy()
+    _foo_gan["model_size"] = "curvy"
+    response = client.post("/exchange/upload", headers={"Authorization": f"Bearer {token}"}, data=_foo_gan, files=files)
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert response.json()["detail"][0]["msg"] == "value is not a valid enumeration member; " \
+                                                  "permitted: 'small', 'medium', 'large'"
+
+
+def test_upload_generator_wrong_epochs(client, onnx_file):
+    client.post("/auth/register", json=foobar)
+    response = client.post("/auth/token", data={"username": foobar["username"], "password": foobar["password"]})
+    token = response.json()["access_token"]
+    files = {"onnx_file": onnx_file.well_formatted}
+    _foo_gan = foo_gan.copy()
+    _foo_gan["epochs"] = 0
+    response = client.post("/exchange/upload", headers={"Authorization": f"Bearer {token}"}, data=_foo_gan, files=files)
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert response.json()["detail"][0]["msg"] == 'ensure this value is greater than or equal to 1'
+
+
+def test_upload_generator_wrong_batch_size(client, onnx_file):
+    client.post("/auth/register", json=foobar)
+    response = client.post("/auth/token", data={"username": foobar["username"], "password": foobar["password"]})
+    token = response.json()["access_token"]
+    files = {"onnx_file": onnx_file.well_formatted}
+    _foo_gan = foo_gan.copy()
+    _foo_gan["batch_size"] = 0
+    response = client.post("/exchange/upload", headers={"Authorization": f"Bearer {token}"}, data=_foo_gan, files=files)
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert response.json()["detail"][0]["msg"] == 'ensure this value is greater than or equal to 1'
+
+
+def test_upload_generator_wrong_description(client, onnx_file):
+    client.post("/auth/register", json=foobar)
+    response = client.post("/auth/token", data={"username": foobar["username"], "password": foobar["password"]})
+    token = response.json()["access_token"]
+    files = {"onnx_file": onnx_file.well_formatted}
+    _foo_gan = foo_gan.copy()
+    _foo_gan["description"] = "x"
+    response = client.post("/exchange/upload", headers={"Authorization": f"Bearer {token}"}, data=_foo_gan, files=files)
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert response.json()["detail"][0]["msg"] == 'ensure this value has at least 4 characters'
+
+
+def test_download_generator(client, onnx_file):
+    client.post("/auth/register", json=foobar)
+    response = client.post("/auth/token", data={"username": foobar["username"], "password": foobar["password"]})
+    token = response.json()["access_token"]
+    files = {"onnx_file": onnx_file.well_formatted}
+    client.post("/exchange/upload", headers={"Authorization": f"Bearer {token}"}, data=foo_gan, files=files)
+    response = client.get("generators/foo_gan/download", headers={"Authorization": f"Bearer {token}"})
+    assert response.status_code == status.HTTP_200_OK
+    assert response.read() == onnx_file.well_formatted
+
+
+def test_download_non_existent_generator(client, onnx_file):
+    client.post("/auth/register", json=foobar)
+    response = client.post("/auth/token", data={"username": foobar["username"], "password": foobar["password"]})
+    token = response.json()["access_token"]
+    response = client.get("generators/foo_gan/download", headers={"Authorization": f"Bearer {token}"})
+    assert response.status_code == status.HTTP_404_NOT_FOUND
+    assert response.json()["detail"] == 'Generator not found'
+
+
+def test_download_non_existent_generator_no_login(client, onnx_file):
+    client.post("/auth/register", json=foobar)
+    response = client.get("generators/foo_gan/download", headers={"Authorization": f"Bearer "})
+    assert response.status_code == LoginRequired.STATUS_CODE
+    assert response.json()["detail"] == LoginRequired.DETAIL

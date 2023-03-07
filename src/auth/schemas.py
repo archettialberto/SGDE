@@ -4,7 +4,7 @@ from pydantic import EmailStr, Field, validator
 
 from src.schemas import SGDEBaseModel
 
-USERNAME_PATTERN = re.compile(r"^[a-zA-Z][a-zA-Z0-9_-]*$")
+USERNAME_PATTERN = re.compile(r"^[a-zA-Z][a-zA-Z0-9_-]{3,15}$")
 VALID_USERNAME = "Username must contain characters, digits, and dashes;" \
                  "username must start with a character"
 

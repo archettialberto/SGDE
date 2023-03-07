@@ -5,7 +5,7 @@ from starlette import status
 from src.auth.schemas import User, JWTData
 from src.auth.utils import get_current_user, parse_jwt_user_data_required
 from src.database import get_db
-from src.exchange.schemas import Generator, DataFormat, Task, ModelSize, GeneratorCreate
+from src.exchange.schemas import Generator, DataFormat, Task, ModelSize, GeneratorCreate, GENERATOR_NAME_PATTERN
 from src.exchange.utils import get_generator_by_name_required, create_generator, download_generator, get_generators
 
 router = APIRouter()
@@ -30,7 +30,7 @@ def exchange_get_generator(
 
 @router.post("/exchange/upload", status_code=status.HTTP_201_CREATED, response_model=Generator)
 def exchange_generator_upload(
-        name: str = Form(),
+        name: str = Form(min_length=4, max_length=16, regex=GENERATOR_NAME_PATTERN.pattern),
         conditioned: bool = Form(),
         data_format: DataFormat = Form(),
         task: Task | None = Form(default=None),
@@ -38,7 +38,7 @@ def exchange_generator_upload(
         model_size: ModelSize = Form(),
         epochs: int = Form(ge=1),
         batch_size: int = Form(ge=1),
-        description: str = Form(min_length=4),
+        description: str = Form(min_length=4, max_length=1000),
         current_user: User = Depends(get_current_user),
         onnx_file: UploadFile = File(),
         db: Session = Depends(get_db)

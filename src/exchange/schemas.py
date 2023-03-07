@@ -5,7 +5,7 @@ from pydantic import Field, validator
 
 from src.schemas import SGDEBaseModel
 
-GENERATOR_NAME_PATTERN = re.compile(r"^[a-zA-Z][a-zA-Z0-9_-]*$")
+GENERATOR_NAME_PATTERN = re.compile(r"^[a-zA-Z][a-zA-Z0-9_-]{3,15}$")
 VALID_GENERATOR_NAME = "Generator name must contain characters, digits, and dashes;" \
                        "generator name must start with a character"
 
