@@ -12,3 +12,4 @@ python-multipart~=0.0.6
 onnx~=1.13.1
 pytest~=7.2.2
 httpx~=0.23.3
+coverage~=7.2.1

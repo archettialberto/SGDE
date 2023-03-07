@@ -1,6 +1,6 @@
 from starlette import status
 
-from src.auth.exceptions import InvalidCredentials, UserNotFound, EmailTaken, UsernameTaken, LoginRequired
+from src.auth.exceptions import InvalidCredentials, UserNotFound, EmailTaken, UsernameTaken, LoginRequired, InvalidToken
 from src.auth.schemas import VALID_USERNAME, VALID_PASSWORD
 
 foobar = {
@@ -120,10 +120,19 @@ def test_non_existing_user_login(client):
 
 
 def test_invalid_credentials(client):
-    client.post("/auth/token", json=foobar)
+    client.post("/auth/register", json=foobar)
     response = client.post("/auth/token", data={"username": foobar["username"], "password": "aaaAAA1?"})
     assert response.status_code == InvalidCredentials.STATUS_CODE
     assert response.json()["detail"] == InvalidCredentials.DETAIL
+
+
+def test_invalid_token(client):
+    client.post("/auth/register", json=foobar)
+    response = client.post("/auth/token", data={"username": foobar["username"], "password": "aaaAAA1!"})
+    token = response.json()["access_token"]
+    response = client.get("/auth/whoami", headers={"Authorization": f"Bearer {'.' + token[1:]}"})
+    assert response.status_code == InvalidToken.STATUS_CODE
+    assert response.json()["detail"] == InvalidToken.DETAIL
 
 
 def test_valid_credentials(client):
