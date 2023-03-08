@@ -1,7 +1,8 @@
 from starlette import status
 
-from src.auth.exceptions import InvalidCredentials, UserNotFound, EmailTaken, UsernameTaken, LoginRequired, InvalidToken
-from src.auth.schemas import VALID_USERNAME, VALID_PASSWORD
+from sgde_server.auth.exceptions import InvalidCredentials, UserNotFound, EmailTaken, UsernameTaken, LoginRequired, \
+    InvalidToken
+from sgde_server.auth.schemas import VALID_USERNAME, VALID_PASSWORD
 
 foobar = {
     "username": "foobar",

@@ -10,10 +10,10 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from starlette.testclient import TestClient
 
-from src.auth.router import router as auth_router
-from src.config import settings, Environment
-from src.database import Base, get_db
-from src.exchange.router import router as exchange_router
+from sgde_server.auth.router import router as auth_router
+from sgde_server.config import settings, Environment
+from sgde_server.database import Base, get_db
+from sgde_server.exchange.router import router as exchange_router
 
 settings.ENVIRONMENT = Environment.TESTING
 settings.INSTANCE_PATH = os.path.join(os.getcwd(), "test_instance")
@@ -63,12 +63,12 @@ def db_session(app):
 def cleanup_db(request):
     def remove_test_dir():
         shutil.rmtree(settings.INSTANCE_PATH)
+
     request.addfinalizer(remove_test_dir)
 
 
 @pytest.fixture(scope="function")
 def client(app, db_session):
-
     def _get_test_db():
         try:
             yield db_session

@@ -1,15 +1,15 @@
 import tensorflow as tf
-tfk = tensorflow.keras
-tfkl = tensorflow.keras.layers
-from blocks import *
+import tensorflow.keras as tfk
+import tensorflow.keras.layers as tfkl
+
 
 class ConditionalHingeGAN(tfk.Model):
-    def __init__(self, discriminator, generator, latent_dim, discriminator_rounds=1):
+    def __init__(self, discriminator, generator, latent_dim, discriminator_rounds: int = 1):
         super(ConditionalHingeGAN, self).__init__()
         self.discriminator = discriminator
         self.generator = generator
         self.latent_dim = latent_dim
-        self.discriminator_rounds = 1
+        self.discriminator_rounds = discriminator_rounds
 
         self.loss_tracker = tfk.metrics.Mean(name="loss")
         self.d_loss_tracker = tfk.metrics.Mean(name="d_loss")
@@ -19,7 +19,7 @@ class ConditionalHingeGAN(tfk.Model):
         super(ConditionalHingeGAN, self).compile()
         self.d_optimizer = d_optimizer
         self.g_optimizer = g_optimizer
-        
+
     def loss_hinge_dis(self, dis_fake, dis_real):
         loss_real = tf.reduce_mean(tf.nn.relu(1.0 - dis_real))
         loss_fake = tf.reduce_mean(tf.nn.relu(1.0 + dis_fake))

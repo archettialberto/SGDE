@@ -1,8 +1,8 @@
 from starlette import status
 
-from src.auth.exceptions import LoginRequired
-from src.exchange.exceptions import GeneratorNotFound, GeneratorExists, InvalidONNX
-from src.exchange.schemas import DataFormat, Task, ModelSize, GENERATOR_NAME_PATTERN
+from sgde_server.auth.exceptions import LoginRequired
+from sgde_server.exchange.exceptions import GeneratorNotFound, GeneratorExists, InvalidONNX
+from sgde_server.exchange.schemas import DataFormat, Task, ModelSize, GENERATOR_NAME_PATTERN
 
 foobar = {
     "username": "foobar",

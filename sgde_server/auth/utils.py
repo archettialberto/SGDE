@@ -6,10 +6,11 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError
 from sqlalchemy.orm import Session
 
-from src.auth.exceptions import EmailTaken, UsernameTaken, UserNotFound, InvalidToken, LoginRequired, InvalidCredentials
-from src.auth.schemas import UserCreate, JWTData, Token, UserDB
-from src.config import settings
-from src.database import UserTable, get_db
+from sgde_server.auth.exceptions import EmailTaken, UsernameTaken, UserNotFound, InvalidToken, LoginRequired, \
+    InvalidCredentials
+from sgde_server.auth.schemas import UserCreate, JWTData, Token, UserDB
+from sgde_server.config import settings
+from sgde_server.database import UserTable, get_db
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/token")
 
