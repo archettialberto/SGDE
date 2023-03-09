@@ -10,10 +10,10 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from starlette.testclient import TestClient
 
-from sgde_server.auth.router import router as auth_router
-from sgde_server.config import settings, Environment
-from sgde_server.database import Base, get_db
-from sgde_server.exchange.router import router as exchange_router
+from sgde_api.auth.router import router as auth_router
+from sgde_api.config import settings, Environment
+from sgde_api.database import Base, get_db
+from sgde_api.exchange.router import router as exchange_router
 
 settings.ENVIRONMENT = Environment.TESTING
 settings.INSTANCE_PATH = os.path.join(os.getcwd(), "test_instance")

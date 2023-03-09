@@ -6,10 +6,10 @@ from fastapi import UploadFile
 from sqlalchemy.orm import Session
 from starlette.responses import FileResponse
 
-from sgde_server.config import settings
-from sgde_server.database import GeneratorTable
-from sgde_server.exchange.exceptions import GeneratorNotFound, GeneratorExists, InvalidONNX, FileWritingError
-from sgde_server.exchange.schemas import GeneratorCreate, GeneratorDB
+from sgde_api.config import settings
+from sgde_api.database import GeneratorTable
+from sgde_api.exchange.exceptions import GeneratorNotFound, GeneratorExists, InvalidONNX, FileWritingError
+from sgde_api.exchange.schemas import GeneratorCreate, GeneratorDB
 
 
 def get_generator_by_name(db: Session, name: str) -> GeneratorDB | None:

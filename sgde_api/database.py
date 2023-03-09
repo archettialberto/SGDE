@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine, Column, String, Integer, LargeBinary, Boolean, ForeignKey
 from sqlalchemy.orm import declarative_base, sessionmaker, relationship
 
-from sgde_server.config import settings
+from sgde_api.config import settings
 
 engine = create_engine(settings.DATABASE_URL, connect_args={"check_same_thread": False})
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

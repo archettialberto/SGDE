@@ -1,4 +1,4 @@
-from sgde_server.exceptions import NotFound, BadRequest
+from sgde_api.exceptions import NotFound, BadRequest
 
 
 class GeneratorNotFound(NotFound):

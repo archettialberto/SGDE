@@ -1,4 +1,4 @@
-from sgde_server.exceptions import BadRequest, NotFound, NotAuthenticated
+from sgde_api.exceptions import BadRequest, NotFound, NotAuthenticated
 
 
 class EmailTaken(BadRequest):

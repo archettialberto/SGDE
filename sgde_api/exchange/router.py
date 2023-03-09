@@ -2,11 +2,11 @@ from fastapi import APIRouter, Query, Depends, Form, UploadFile, File
 from sqlalchemy.orm import Session
 from starlette import status
 
-from sgde_server.auth.schemas import User, JWTData
-from sgde_server.auth.utils import get_current_user, parse_jwt_user_data_required
-from sgde_server.database import get_db
-from sgde_server.exchange.schemas import Generator, DataFormat, Task, ModelSize, GeneratorCreate, GENERATOR_NAME_PATTERN
-from sgde_server.exchange.utils import get_generator_by_name_required, create_generator, download_generator, \
+from sgde_api.auth.schemas import User, JWTData
+from sgde_api.auth.utils import get_current_user, parse_jwt_user_data_required
+from sgde_api.database import get_db
+from sgde_api.exchange.schemas import Generator, DataFormat, Task, ModelSize, GeneratorCreate, GENERATOR_NAME_PATTERN
+from sgde_api.exchange.utils import get_generator_by_name_required, create_generator, download_generator, \
     get_generators
 
 router = APIRouter()

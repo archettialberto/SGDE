@@ -2,7 +2,7 @@ import numpy as np
 import re
 from pydantic import Field, validator, BaseModel
 
-from sgde_server.exchange.schemas import DataFormat, Task, ModelSize
+from sgde_api.exchange.schemas import DataFormat, Task, ModelSize
 
 
 class MetadataBase(BaseModel):

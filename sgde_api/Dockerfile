@@ -1,0 +1,16 @@
+FROM python:3.10.9-slim-buster
+
+WORKDIR /src
+
+RUN apt-get update && apt clean
+
+COPY requirements.txt /tmp/requirements.txt
+
+RUN pip install -U --upgrade pip
+RUN pip install --upgrade -r /tmp/requirements.txt
+
+COPY . /src/sgde_api
+
+EXPOSE 8000
+
+CMD ["uvicorn", "sgde_api.main:app", "--host", "0.0.0.0", "--port", "8000"]
