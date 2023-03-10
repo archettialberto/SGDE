@@ -1,4 +1,4 @@
-FROM python:3.10.9-slim-buster
+FROM tensorflow/tensorflow:latest-gpu-jupyter
 
 WORKDIR /src
 
@@ -9,8 +9,9 @@ COPY requirements.txt /tmp/requirements.txt
 RUN pip install -U --upgrade pip
 RUN pip install -r /tmp/requirements.txt
 
-COPY . /src/sgde_api
+COPY . /src/sgde_client
 
-EXPOSE 8000
+RUN mkdir -p ./local
+RUN chmod -R 777 /.local
 
-CMD ["uvicorn", "sgde_api.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["/bin/bash"]

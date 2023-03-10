@@ -4,8 +4,8 @@ services:
   sgde-api:
     container_name: sgde-api-container
     image: ai-sprint-sgde/sgde-api:0
-    # env_file:
-    #   - .env
+    env_file:
+      - .env
     # environment:
     #   - POSTGRES_USER=app
     build:

@@ -12,7 +12,7 @@ RUN apt-get update && apt-get install -y \
 COPY requirements.txt /tmp/requirements.txt
 
 RUN pip install -U --upgrade pip
-RUN pip install --upgrade -r /tmp/requirements.txt
+RUN pip install -r /tmp/requirements.txt
 
 COPY . /src/sgde_frontend
 
