@@ -35,7 +35,7 @@ class Config(BaseSettings):
     GENERATOR_PATH: str = os.path.join(os.getcwd(), "instance", "generators")
 
     class Config:
-        env_file = ".env"
+        env_file = ".api.env"
 
 
 settings = Config()
