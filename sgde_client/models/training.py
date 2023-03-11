@@ -138,10 +138,9 @@ def train_image_generator(
     if path is None:
         path = os.path.join(os.getcwd(), f"{name}_{datetime.utcnow().strftime('%y%m%d%H%M%S')}.onnx")
 
-    # TODO fix input shape
     model_proto, _ = tf2onnx.convert.from_keras(
         gan,
-        input_signature=(tf.TensorSpec((None, 74), tf.float32, name="input"),),
+        input_signature=(tf.TensorSpec((None, metadata['generator_input_shape']), tf.float32, name="input"),),
         opset=13,
         output_path=path
     )
