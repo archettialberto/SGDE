@@ -5,7 +5,7 @@ from json import JSONDecodeError
 
 import requests
 
-from sgde_client.exceptions import ResponseException, ClientException
+from sgde_client.exceptions import ResponseException, MissingAuthorization, ServerUnreachable
 from sgde_client.config import settings
 
 
@@ -25,7 +25,7 @@ def send_request(method: str, authenticate: bool = False):
 
             if authenticate:
                 if "ACCESS_TOKEN" not in os.environ:
-                    raise ClientException("You must login first")
+                    raise MissingAuthorization()
                 token = os.getenv("ACCESS_TOKEN")
                 if "headers" not in payload:
                     payload["headers"] = {}
@@ -36,7 +36,7 @@ def send_request(method: str, authenticate: bool = False):
             try:
                 resp = request_fn(url, **payload)
             except requests.ConnectionError:
-                raise ClientException("Server unreachable")
+                raise ServerUnreachable()
 
             if resp.status_code not in [200, 201]:
                 try:
