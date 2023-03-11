@@ -43,8 +43,10 @@ def download_generator(generator_name: str, path: str | None = None):
 
 
 @post_request(authenticate=True)
-def upload_generator_request():
-    return f"exchange/upload", {"data": {}, "files": {}}
+def upload_generator_request(path: str, metadata: dict):
+    with open(path, "rb") as f:
+        onnx = f.read()
+    return f"exchange/upload", {"data": metadata, "files": {"onnx_file": onnx}}
 
 
 def upload_generator():
