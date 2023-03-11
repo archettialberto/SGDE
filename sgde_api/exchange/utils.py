@@ -9,7 +9,12 @@ from starlette.responses import FileResponse
 from sgde_api.config import settings
 from sgde_api.database import GeneratorTable
 from sgde_api.exchange.exceptions import GeneratorNotFound, GeneratorExists, InvalidONNX, FileWritingError
-from sgde_api.exchange.schemas import GeneratorCreate, GeneratorDB
+from schemas import GeneratorCreate, GeneratorBase
+
+
+class GeneratorDB(GeneratorBase):
+    owner: str
+    filename: str
 
 
 def get_generator_by_name(db: Session, name: str) -> GeneratorDB | None:

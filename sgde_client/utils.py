@@ -1,6 +1,7 @@
 import functools
 import logging
 import os
+from json import JSONDecodeError
 
 import requests
 
@@ -38,9 +39,15 @@ def send_request(method: str, authenticate: bool = False):
                 raise ClientException("Server unreachable")
 
             if resp.status_code not in [200, 201]:
-                raise ResponseException(resp.status_code, str(resp.json()))
+                try:
+                    raise ResponseException(resp.status_code, str(resp.json()))
+                except JSONDecodeError:
+                    raise ResponseException(resp.status_code, "")
 
-            logging.info(f"[{resp.status_code}] {resp.json()}")
+            try:
+                logging.info(f"[{resp.status_code}] {resp.json()}")
+            except JSONDecodeError:
+                logging.info(f"[{resp.status_code}]")
             return resp
 
         return wrapped_fn

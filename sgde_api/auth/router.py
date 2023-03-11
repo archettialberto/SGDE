@@ -3,9 +3,9 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from starlette import status
 
-from sgde_api.auth.schemas import User, UserCreate, JWTData, Token
+from schemas import UserCreate, User
 from sgde_api.auth.utils import get_users, create_user, get_user_by_username_required, parse_jwt_user_data_required, \
-    create_access_token_for_auth_user
+    create_access_token_for_auth_user, JWTData, Token
 from sgde_api.database import get_db
 
 router = APIRouter()

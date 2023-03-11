@@ -2,7 +2,7 @@ from starlette import status
 
 from sgde_api.auth.exceptions import InvalidCredentials, UserNotFound, EmailTaken, UsernameTaken, LoginRequired, \
     InvalidToken
-from sgde_api.auth.schemas import VALID_USERNAME, VALID_PASSWORD
+from schemas import VALID_USERNAME, VALID_PASSWORD
 
 foobar = {
     "username": "foobar",

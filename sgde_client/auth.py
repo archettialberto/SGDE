@@ -3,7 +3,8 @@ from getpass import getpass
 
 import pandas as pd
 
-from utils import post_request, get_request
+from schemas import UserCreate, User
+from sgde_client.utils import post_request, get_request
 
 
 @post_request()
@@ -14,12 +15,15 @@ def register_request():
     confirmed_password = str(getpass("Confirm password: "))
     if password != confirmed_password:
         raise ValueError("Passwords must match")
-    return "auth/register", {"json": {"username": username, "email": email, "password": password}}
+    user = UserCreate(username=username, email=email, password=password)
+    return "auth/register", {"json": user.dict()}
 
 
-def register():
+def register() -> User:
     response = register_request()
-    print(f"Registered as {response.json()['username']} ({response.json()['email']})")
+    user = User(**response.json())
+    print(f"Registered as {user.username} ({user.email})")
+    return user
 
 
 @post_request()
@@ -40,18 +44,19 @@ def whoami_request():
     return "auth/whoami", {}
 
 
-def whoami():
+def whoami() -> User:
     response = whoami_request()
-    user = response.json()
-    print(f"Logged in as {user['username']} ({user['email']})")
+    user = User(**response.json())
+    print(f"Logged in as {user.username} ({user.email})")
+    return user
 
 
 @get_request()
 def get_users_request(skip: int = 0, limit: int = 10):
-    return f"users?skip={skip}&limit={limit}", {}
+    return f"users/?skip={skip}&limit={limit}", {}
 
 
-def get_users(skip: int = 0, limit: int = 10):
+def get_users(skip: int = 0, limit: int = 10) -> pd.DataFrame:
     response = get_users_request(skip=skip, limit=limit)
     return pd.DataFrame(response.json())
 
@@ -61,6 +66,6 @@ def get_user_request(username: str):
     return f"users/{username}", {}
 
 
-def get_user(username: str):
+def get_user(username: str) -> User:
     response = get_user_request(username=username)
-    return pd.DataFrame([response.json()])
+    return User(**response.json())

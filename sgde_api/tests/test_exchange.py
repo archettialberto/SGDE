@@ -2,7 +2,7 @@ from starlette import status
 
 from sgde_api.auth.exceptions import LoginRequired
 from sgde_api.exchange.exceptions import GeneratorNotFound, GeneratorExists, InvalidONNX
-from sgde_api.exchange.schemas import DataFormat, Task, ModelSize, GENERATOR_NAME_PATTERN
+from schemas import GENERATOR_NAME_PATTERN, DataFormat, Task, ModelSize
 
 foobar = {
     "username": "foobar",

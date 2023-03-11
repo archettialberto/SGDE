@@ -14,6 +14,7 @@ COPY requirements.txt /tmp/requirements.txt
 RUN pip install -U --upgrade pip
 RUN pip install -r /tmp/requirements.txt
 
+COPY ../schemas.py /src
 COPY . /src/sgde_frontend
 
 EXPOSE 8501

@@ -4,15 +4,20 @@ import bcrypt
 from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError
+from pydantic import Field
 from sqlalchemy.orm import Session
 
 from sgde_api.auth.exceptions import EmailTaken, UsernameTaken, UserNotFound, InvalidToken, LoginRequired, \
     InvalidCredentials
-from sgde_api.auth.schemas import UserCreate, JWTData, Token, UserDB
+from schemas import UserCreate, UserBase, SGDEBaseModel
 from sgde_api.config import settings
 from sgde_api.database import UserTable, get_db
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/token")
+
+
+class UserDB(UserBase):
+    hashed_password: bytes
 
 
 def get_user_by_username(db: Session, username: str) -> UserDB | None:
@@ -71,6 +76,10 @@ def create_access_token(user: UserDB, expires_delta: timedelta = timedelta(minut
     return jwt.encode(jwt_data, settings.JWT_SECRET, algorithm=settings.JWT_ALG)
 
 
+class JWTData(SGDEBaseModel):
+    username: str = Field(alias="sub")
+
+
 def parse_jwt_user_data(token: str = Depends(oauth2_scheme)) -> JWTData | None:
     if not token:
         return None
@@ -94,6 +103,11 @@ def authenticate_user(db: Session, username: str, password: str) -> UserDB:
     if not verify_password(password, user.hashed_password):
         raise InvalidCredentials()
     return user
+
+
+class Token(SGDEBaseModel):
+    access_token: str
+    token_type: str = "bearer"
 
 
 def create_access_token_for_auth_user(db: Session, username: str, password: str) -> Token:
