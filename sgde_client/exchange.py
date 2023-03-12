@@ -32,7 +32,7 @@ def download_generator_request(generator_name: str):
     return f"generators/{generator_name}/download", {}
 
 
-def download_generator(generator_name: str, path: str | None = None):
+def download_generator(generator_name: str, path: str | None = None) -> str:
     response = download_generator_request(generator_name=generator_name)
     filename = f"{generator_name}_{datetime.utcnow().strftime('%y%m%d%H%M%S')}.onnx"
     if path is None:
@@ -42,6 +42,7 @@ def download_generator(generator_name: str, path: str | None = None):
     with open(path, "wb") as f:
         f.write(response.content)
     print(f"Generator downloaded at {path}")
+    return path
 
 
 @post_request(authenticate=True)
