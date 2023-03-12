@@ -1,5 +1,10 @@
 version: '3.7'
 
+networks:
+  sgde_network:
+    external: false
+    name: sgde_network
+
 services:
   sgde-api:
     container_name: sgde-api-container
@@ -8,11 +13,16 @@ services:
       - .api.env
     # environment:
     #   - POSTGRES_USER=app
+    networks:
+      sgde_network:
+        aliases:
+          - sgde_api
     build:
       context: sgde_api
       dockerfile: sgde_api/Dockerfile
     volumes:
       - ./sgde_api:/src/sgde_api
+      - ./schemas.py:/src/schemas.py
     ports:
       - "8000:8000"
 
@@ -24,6 +34,11 @@ services:
       dockerfile: sgde_frontend/Dockerfile
     volumes:
       - ./sgde_frontend:/src/sgde_frontend
+      - ./schemas.py:/src/schemas.py
+    networks:
+      sgde_network:
+        aliases:
+          - sgde_frontend
     ports:
       - "8501:8501"
     depends_on:

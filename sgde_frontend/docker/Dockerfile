@@ -9,13 +9,13 @@ RUN apt-get update && apt-get install -y \
     git \
     && rm -rf /var/lib/apt/lists/*
 
-COPY requirements.txt /tmp/requirements.txt
+COPY ./sgde_frontend/docker/requirements.txt /tmp/requirements.txt
 
 RUN pip install -U --upgrade pip
 RUN pip install -r /tmp/requirements.txt
 
-COPY ../schemas.py /src
-COPY . /src/sgde_frontend
+COPY ./schemas.py /src
+COPY ./sgde_frontend /src/sgde_frontend
 
 EXPOSE 8501
 HEALTHCHECK CMD curl --fail http://localhost:8501/_stcore/health
