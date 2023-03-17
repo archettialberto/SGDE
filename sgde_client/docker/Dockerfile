@@ -4,7 +4,7 @@ WORKDIR /src
 
 RUN apt-get update && apt clean
 
-COPY ./sgde_client/requirements.txt /tmp/requirements.txt
+COPY ./sgde_client/docker/requirements.txt /tmp/requirements.txt
 
 RUN pip install -U --upgrade pip
 RUN pip install -r /tmp/requirements.txt
