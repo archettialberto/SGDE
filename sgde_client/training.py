@@ -31,7 +31,7 @@ def train_image_generator(
         verbose: int = 1,
         classification_epochs=100,
         path: str = None
-) -> tuple[str, dict, GeneratorCreate]:
+):
 
     # Extract metadata
     if verbose > 0: print('Metadata extraction started...')
@@ -67,7 +67,7 @@ def train_image_generator(
 
     # Train a classifier on real data
     if verbose > 0: print('Classifier training on real data started...')
-    '''
+
     real_classifier = build_resnet18(metadata['generator_output_shape'][1:], metadata['num_classes'])
     metadata['classifier_real_history'] = real_classifier.fit(
         dataset_train,
@@ -79,7 +79,7 @@ def train_image_generator(
     ).history
 
     metadata['classifier_real_best_accuracy'] = max(metadata['classifier_real_history']['val_accuracy'])
-    '''
+
     if verbose > 0: print('Classifier training on real data completed!')
 
     # Build the generator
@@ -119,7 +119,7 @@ def train_image_generator(
 
     # Train the generator
     if verbose > 0: print('Generator training started...')
-    '''
+
     metadata['history'] = gan.fit(
         dataset_train,
         batch_size=metadata['batch_size'],
@@ -127,7 +127,7 @@ def train_image_generator(
         verbose=2,
         callbacks=cb
     ).history
-    '''
+
     if verbose > 0: print('Generator training completed!')
 
     # Save the generator
@@ -147,7 +147,7 @@ def train_image_generator(
 
     metadata['model'] = gan
     if verbose > 0: print('Generator saving completed!')
-    '''
+
 
     # Generate a dataset
     if verbose > 0: print('Sampling started...')
@@ -183,6 +183,6 @@ def train_image_generator(
 
     metadata['classifier_gen_best_accuracy'] = max(metadata['classifier_gen_history']['val_accuracy'])
     if verbose > 0: print('Classifier training on generated data completed!')
-    '''
+
 
     return path, metadata, parsed_metadata

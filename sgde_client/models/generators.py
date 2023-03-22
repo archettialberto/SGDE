@@ -20,7 +20,7 @@ def generator_block(
 
 
 def build_generator(
-        output_shape: tuple[int, int, int],
+        output_shape,
         latent_dim: int,
         filters: int,
         blocks: int
@@ -63,7 +63,7 @@ def discriminator_block(
 
 
 def build_discriminator(
-        input_shape: tuple[int, int, int],
+        input_shape,
         filters: int,
         blocks: int
 ):

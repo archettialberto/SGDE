@@ -1,3 +1,6 @@
+from sgde_client.config import settings
+
+
 class ClientException(Exception):
     def __init__(self, message):
         self.message = message
@@ -17,4 +20,4 @@ class MissingAuthorization(ClientException):
 
 class ServerUnreachable(ClientException):
     def __init__(self):
-        super(ServerUnreachable, self).__init__("Server unreachable")
+        super(ServerUnreachable, self).__init__(f"Server unreachable ({settings.API_IP}:{settings.API_PORT})")

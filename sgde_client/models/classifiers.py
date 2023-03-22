@@ -4,7 +4,7 @@ import tensorflow.keras.layers as tfkl
 
 
 def build_resnet18(
-        input_shape: tuple[int, int, int],
+        input_shape,
         num_classes: int,
         filters: int = 64,
         weight_decay: float = 2e-4

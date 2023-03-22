@@ -68,8 +68,8 @@ class GeneratorBase(SGDEBaseModel):
     name: str = Field(min_length=4, max_length=16)
     conditioned: bool
     data_format: DataFormat
-    task: Task | None
-    num_classes: int | None = Field(ge=2)
+    task: Task = None
+    num_classes: int = Field(default=None, ge=2)
     model_size: ModelSize
     epochs: int = Field(ge=1)
     batch_size: int = Field(ge=1)
