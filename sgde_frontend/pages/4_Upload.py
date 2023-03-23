@@ -37,14 +37,18 @@ if upload_button:
         "model_size": model_size,
         "epochs": epochs,
         "batch_size": batch_size,
-        "description": description
+        "description": description,
     }
     try:
         response = requests.post(
             FASTAPI_ENDPOINT,
             headers={"Authorization": f"Bearer {st.session_state['access_token']}"},
             data=upload_data,
-            files={"onnx_file": file_uploader.getvalue() if file_uploader is not None else None}
+            files={
+                "onnx_file": file_uploader.getvalue()
+                if file_uploader is not None
+                else None
+            },
         )
         if response.status_code == 201:
             st.success("Upload successful!")

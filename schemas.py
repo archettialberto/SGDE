@@ -11,16 +11,24 @@ class SGDEBaseModel(BaseModel):
 
 
 GENERATOR_NAME_PATTERN = re.compile(r"^[a-zA-Z][a-zA-Z0-9_-]{3,15}$")
-VALID_GENERATOR_NAME = "Generator name must contain characters, digits, and dashes;" \
-                       "generator name must start with a character"
+VALID_GENERATOR_NAME = (
+    "Generator name must contain characters, digits, and dashes;"
+    "generator name must start with a character"
+)
 USERNAME_PATTERN = re.compile(r"^[a-zA-Z][a-zA-Z0-9_-]{3,15}$")
-VALID_USERNAME = "Username must contain characters, digits, and dashes;" \
-                 "username must start with a character"
-STRONG_PASSWORD_PATTERN = re.compile(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*\W)[a-zA-Z\d\W]+$")
-VALID_PASSWORD = "Password must contain at least one lower character, " \
-                 "one upper character, " \
-                 "one digit, " \
-                 "and one special symbol"
+VALID_USERNAME = (
+    "Username must contain characters, digits, and dashes;"
+    "username must start with a character"
+)
+STRONG_PASSWORD_PATTERN = re.compile(
+    r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*\W)[a-zA-Z\d\W]+$"
+)
+VALID_PASSWORD = (
+    "Password must contain at least one lower character, "
+    "one upper character, "
+    "one digit, "
+    "and one special symbol"
+)
 
 
 class UserBase(SGDEBaseModel):

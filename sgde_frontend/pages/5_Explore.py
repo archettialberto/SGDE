@@ -6,7 +6,9 @@ FASTAPI_ENDPOINT = "http://sgde_api:8000"
 GENERATORS_ENDPOINT = f"{FASTAPI_ENDPOINT}/generators/"
 response = requests.get(GENERATORS_ENDPOINT)
 
-st.set_page_config(page_title="SGDE - Explore", page_icon=":earth_africa:", layout="wide")
+st.set_page_config(
+    page_title="SGDE - Explore", page_icon=":earth_africa:", layout="wide"
+)
 st.header(":earth_africa: Explore")
 
 generators = response.json()
@@ -23,7 +25,7 @@ sort_by = st.sidebar.selectbox("Sort by", ["name"])
 sorted_df = filtered_df.sort_values(by=sort_by)
 
 if len(sorted_df) == 0:
-    st.write('No generators found.')
+    st.write("No generators found.")
 else:
     columns = list(df.columns)
     excluded_columns = ["conditioned", "batch_size", "description"]
@@ -43,4 +45,4 @@ else:
                 with col:
                     st.write(sorted_df.loc[i, col_name])
         with cols[-1]:
-            st.download_button(label=":arrow_down:", data=sorted_df.loc[i, 'name'])
+            st.download_button(label=":arrow_down:", data=sorted_df.loc[i, "name"])

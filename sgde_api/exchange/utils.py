@@ -8,7 +8,12 @@ from starlette.responses import FileResponse
 
 from sgde_api.config import settings
 from sgde_api.database import GeneratorTable
-from sgde_api.exchange.exceptions import GeneratorNotFound, GeneratorExists, InvalidONNX, FileWritingError
+from sgde_api.exchange.exceptions import (
+    GeneratorNotFound,
+    GeneratorExists,
+    InvalidONNX,
+    FileWritingError,
+)
 from schemas import GeneratorCreate, GeneratorBase
 
 
@@ -37,7 +42,7 @@ def save_generator_file(onnx_file: UploadFile) -> str:
     try:
         contents = onnx_file.file.read()
         onnx.checker.check_model(contents)
-        with open(os.path.join(settings.GENERATOR_PATH, filename), 'wb') as f:
+        with open(os.path.join(settings.GENERATOR_PATH, filename), "wb") as f:
             f.write(contents)
     except onnx.checker.ValidationError:
         raise InvalidONNX()
@@ -48,7 +53,9 @@ def save_generator_file(onnx_file: UploadFile) -> str:
     return filename
 
 
-def create_generator(db: Session, generator: GeneratorCreate, username: str, onnx_file: UploadFile) -> GeneratorDB:
+def create_generator(
+    db: Session, generator: GeneratorCreate, username: str, onnx_file: UploadFile
+) -> GeneratorDB:
     if get_generator_by_name(db, generator.name):
         raise GeneratorExists()
     filename = save_generator_file(onnx_file)
@@ -66,4 +73,6 @@ def create_generator(db: Session, generator: GeneratorCreate, username: str, onn
 def download_generator(db: Session, name: str) -> FileResponse:
     generator = get_generator_by_name_required(db, name)
     generator_path = os.path.join(settings.GENERATOR_PATH, generator.filename)
-    return FileResponse(path=generator_path, filename=f"{generator.owner}_{generator.name}.onnx")
+    return FileResponse(
+        path=generator_path, filename=f"{generator.owner}_{generator.name}.onnx"
+    )

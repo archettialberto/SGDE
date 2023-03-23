@@ -1,14 +1,16 @@
 from starlette import status
 
-from sgde_api.auth.exceptions import InvalidCredentials, UserNotFound, EmailTaken, UsernameTaken, LoginRequired, \
-    InvalidToken
+from sgde_api.auth.exceptions import (
+    InvalidCredentials,
+    UserNotFound,
+    EmailTaken,
+    UsernameTaken,
+    LoginRequired,
+    InvalidToken,
+)
 from schemas import VALID_USERNAME, VALID_PASSWORD
 
-foobar = {
-    "username": "foobar",
-    "email": "user@example.com",
-    "password": "aaaAAA1!"
-}
+foobar = {"username": "foobar", "email": "user@example.com", "password": "aaaAAA1!"}
 
 
 def test_get_empty_user_table(client):
@@ -31,38 +33,53 @@ def test_register(client):
 
 def test_get_populated_user_table(client):
     for i in range(5):
-        client.post("/auth/register", json={
-            "username": f"user{i}",
-            "email": f"user{i}@example.com",
-            "password": "aaaAAA1!"
-        })
+        client.post(
+            "/auth/register",
+            json={
+                "username": f"user{i}",
+                "email": f"user{i}@example.com",
+                "password": "aaaAAA1!",
+            },
+        )
     response = client.get("/users")
     assert response.status_code == status.HTTP_200_OK
-    assert response.json() == [{"username": f"user{i}", "email": f"user{i}@example.com"} for i in range(5)]
+    assert response.json() == [
+        {"username": f"user{i}", "email": f"user{i}@example.com"} for i in range(5)
+    ]
 
 
 def test_limit_skip_for_get_clients(client):
     for i in range(15):
-        client.post("/auth/register", json={
-            "username": f"user{i}",
-            "email": f"user{i}@example.com",
-            "password": "aaaAAA1!"
-        })
+        client.post(
+            "/auth/register",
+            json={
+                "username": f"user{i}",
+                "email": f"user{i}@example.com",
+                "password": "aaaAAA1!",
+            },
+        )
     response = client.get("/users?skip=3")
     assert response.status_code == status.HTTP_200_OK
-    assert response.json() == [{"username": f"user{i}", "email": f"user{i}@example.com"} for i in range(3, 13)]
+    assert response.json() == [
+        {"username": f"user{i}", "email": f"user{i}@example.com"} for i in range(3, 13)
+    ]
 
 
 def test_limit_skip_for_get_clients_with_high_limit(client):
     for i in range(15):
-        client.post("/auth/register", json={
-            "username": f"user{i}",
-            "email": f"user{i}@example.com",
-            "password": "aaaAAA1!"
-        })
+        client.post(
+            "/auth/register",
+            json={
+                "username": f"user{i}",
+                "email": f"user{i}@example.com",
+                "password": "aaaAAA1!",
+            },
+        )
     response = client.get("/users?skip=3&limit=100")
     assert response.status_code == status.HTTP_200_OK
-    assert response.json() == [{"username": f"user{i}", "email": f"user{i}@example.com"} for i in range(3, 15)]
+    assert response.json() == [
+        {"username": f"user{i}", "email": f"user{i}@example.com"} for i in range(3, 15)
+    ]
 
 
 def test_register_existing_username(client):
@@ -115,30 +132,42 @@ def test_malformed_password(client):
 
 
 def test_non_existing_user_login(client):
-    response = client.post("/auth/token", data={"username": foobar["username"], "password": foobar["password"]})
+    response = client.post(
+        "/auth/token",
+        data={"username": foobar["username"], "password": foobar["password"]},
+    )
     assert response.status_code == InvalidCredentials.STATUS_CODE
     assert response.json()["detail"] == InvalidCredentials.DETAIL
 
 
 def test_invalid_credentials(client):
     client.post("/auth/register", json=foobar)
-    response = client.post("/auth/token", data={"username": foobar["username"], "password": "aaaAAA1?"})
+    response = client.post(
+        "/auth/token", data={"username": foobar["username"], "password": "aaaAAA1?"}
+    )
     assert response.status_code == InvalidCredentials.STATUS_CODE
     assert response.json()["detail"] == InvalidCredentials.DETAIL
 
 
 def test_invalid_token(client):
     client.post("/auth/register", json=foobar)
-    response = client.post("/auth/token", data={"username": foobar["username"], "password": "aaaAAA1!"})
+    response = client.post(
+        "/auth/token", data={"username": foobar["username"], "password": "aaaAAA1!"}
+    )
     token = response.json()["access_token"]
-    response = client.get("/auth/whoami", headers={"Authorization": f"Bearer {'.' + token[1:]}"})
+    response = client.get(
+        "/auth/whoami", headers={"Authorization": f"Bearer {'.' + token[1:]}"}
+    )
     assert response.status_code == InvalidToken.STATUS_CODE
     assert response.json()["detail"] == InvalidToken.DETAIL
 
 
 def test_valid_credentials(client):
     client.post("/auth/register", json=foobar)
-    response = client.post("/auth/token", data={"username": foobar["username"], "password": foobar["password"]})
+    response = client.post(
+        "/auth/token",
+        data={"username": foobar["username"], "password": foobar["password"]},
+    )
     assert response.status_code == status.HTTP_200_OK
     assert "access_token" in response.json()
 
@@ -151,7 +180,10 @@ def test_unauthorized_whoami(client):
 
 def test_authorized_whoami(client):
     client.post("/auth/register", json=foobar)
-    response = client.post("/auth/token", data={"username": foobar["username"], "password": foobar["password"]})
+    response = client.post(
+        "/auth/token",
+        data={"username": foobar["username"], "password": foobar["password"]},
+    )
     token = response.json()["access_token"]
     response = client.get("/auth/whoami", headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == status.HTTP_200_OK

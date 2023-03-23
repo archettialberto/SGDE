@@ -23,7 +23,7 @@ os.makedirs(settings.INSTANCE_PATH, exist_ok=True)
 os.makedirs(settings.GENERATOR_PATH, exist_ok=True)
 engine = create_engine(
     f'sqlite:///{os.path.join(settings.INSTANCE_PATH, "sgde_test_db.db")}',
-    connect_args={"check_same_thread": False}
+    connect_args={"check_same_thread": False},
 )
 SessionTesting = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
@@ -85,13 +85,13 @@ def onnx_file():
     onnx_folder = os.path.join(os.getcwd(), "test_onnx")
     os.makedirs(onnx_folder, exist_ok=True)
 
-    X = make_tensor_value_info('X', TensorProto.FLOAT, [None, None])
-    A = make_tensor_value_info('A', TensorProto.FLOAT, [None, None])
-    B = make_tensor_value_info('B', TensorProto.FLOAT, [None, None])
-    Y = make_tensor_value_info('Y', TensorProto.FLOAT, [None])
-    node1 = make_node('MatMul', ['X', 'A'], ['XA'])
-    node2 = make_node('Add', ['XA', 'B'], ['Y'])
-    graph = make_graph([node1, node2], 'lr', [X, A, B], [Y])
+    X = make_tensor_value_info("X", TensorProto.FLOAT, [None, None])
+    A = make_tensor_value_info("A", TensorProto.FLOAT, [None, None])
+    B = make_tensor_value_info("B", TensorProto.FLOAT, [None, None])
+    Y = make_tensor_value_info("Y", TensorProto.FLOAT, [None])
+    node1 = make_node("MatMul", ["X", "A"], ["XA"])
+    node2 = make_node("Add", ["XA", "B"], ["Y"])
+    graph = make_graph([node1, node2], "lr", [X, A, B], [Y])
     onnx_model = make_model(graph)
     check_model(onnx_model)
 

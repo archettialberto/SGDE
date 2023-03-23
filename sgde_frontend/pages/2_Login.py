@@ -30,10 +30,12 @@ if whoami_button:
     try:
         response = requests.get(
             WHOAMI_ENDPOINT,
-            headers={"Authorization": f"Bearer {st.session_state['access_token']}"}
+            headers={"Authorization": f"Bearer {st.session_state['access_token']}"},
         )
         if response.status_code == 200:
-            st.success(f"You are logged in as {response.json()['username']} ({response.json()['email']}).")
+            st.success(
+                f"You are logged in as {response.json()['username']} ({response.json()['email']})."
+            )
         else:
             st.error(f"Login failed. {response.text}")
     except KeyError:

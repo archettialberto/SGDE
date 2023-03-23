@@ -6,44 +6,37 @@ import tensorflow.keras as tfk
 import tensorflow.keras.layers as tfkl
 
 
-def generator_block(
-        x,
-        filters: int,
-        name: str = ''
-):
-    x = tfkl.BatchNormalization(name=name + 'bn')(x)
-    x = tfkl.ReLU(name=name + 'act')(x)
-    x = tfkl.UpSampling2D(interpolation='bilinear', name=name + 'up')(x)
-    x = tfkl.Conv2D(filters, 3, padding='same', name=name + 'conv')(x)
+def generator_block(x, filters: int, name: str = ""):
+    x = tfkl.BatchNormalization(name=name + "bn")(x)
+    x = tfkl.ReLU(name=name + "act")(x)
+    x = tfkl.UpSampling2D(interpolation="bilinear", name=name + "up")(x)
+    x = tfkl.Conv2D(filters, 3, padding="same", name=name + "conv")(x)
 
     return x
 
 
-def build_generator(
-        output_shape,
-        latent_dim: int,
-        filters: int,
-        blocks: int
-):
-    assert output_shape[0] % 2 ** blocks == 0
-    assert output_shape[1] % 2 ** blocks == 0
-    initial_h = output_shape[0] // 2 ** blocks
-    initial_w = output_shape[1] // 2 ** blocks
-    initial_c = filters * 2 ** blocks
+def build_generator(output_shape, latent_dim: int, filters: int, blocks: int):
+    assert output_shape[0] % 2**blocks == 0
+    assert output_shape[1] % 2**blocks == 0
+    initial_h = output_shape[0] // 2**blocks
+    initial_w = output_shape[1] // 2**blocks
+    initial_c = filters * 2**blocks
 
     # Latent noise
-    z = tfkl.Input(latent_dim, name='z')
+    z = tfkl.Input(latent_dim, name="z")
 
-    x = tfkl.Dense(initial_h * initial_w * initial_c, name='initial')(z)
-    x = tfkl.Reshape((initial_h, initial_w, initial_c), name='reshape')(x)
+    x = tfkl.Dense(initial_h * initial_w * initial_c, name="initial")(z)
+    x = tfkl.Reshape((initial_h, initial_w, initial_c), name="reshape")(x)
 
     for b in range(blocks):
-        x = generator_block(x, filters=filters * 2 ** (blocks - 1 - b), name='block' + str(b + 1) + '_')
+        x = generator_block(
+            x, filters=filters * 2 ** (blocks - 1 - b), name="block" + str(b + 1) + "_"
+        )
 
-    x = tfkl.BatchNormalization(name='bn')(x)
-    x = tfkl.ReLU(name='act')(x)
-    x = tfkl.Conv2D(output_shape[-1], 3, padding='same', name='conv')(x)
-    x = tfkl.Activation('tanh', name='tanh')(x)
+    x = tfkl.BatchNormalization(name="bn")(x)
+    x = tfkl.ReLU(name="act")(x)
+    x = tfkl.Conv2D(output_shape[-1], 3, padding="same", name="conv")(x)
+    x = tfkl.Activation("tanh", name="tanh")(x)
 
     generator = tfk.Model(inputs=z, outputs=x, name="Generator")
 
@@ -51,39 +44,39 @@ def build_generator(
 
 
 def discriminator_block(
-        x,
-        filters: int,
-        name: str = '',
+    x,
+    filters: int,
+    name: str = "",
 ):
-    x = tfkl.ReLU(name=name + 'act2')(x)
-    x = tfkl.AveragePooling2D(name=name + 'pool')(x)
-    x = tfkl.Conv2D(filters, 3, padding='same', name=name + 'conv2')(x)
+    x = tfkl.ReLU(name=name + "act2")(x)
+    x = tfkl.AveragePooling2D(name=name + "pool")(x)
+    x = tfkl.Conv2D(filters, 3, padding="same", name=name + "conv2")(x)
 
     return x
 
 
-def build_discriminator(
-        input_shape,
-        filters: int,
-        blocks: int
-):
-    input_layer = tfkl.Input(input_shape, name='x')
-    x = tf.keras.layers.RandomFlip(mode='horizontal')(input_layer)
-    x = tfkl.Conv2D(filters, 3, padding='same', name='conv0')(x)
+def build_discriminator(input_shape, filters: int, blocks: int):
+    input_layer = tfkl.Input(input_shape, name="x")
+    x = tf.keras.layers.RandomFlip(mode="horizontal")(input_layer)
+    x = tfkl.Conv2D(filters, 3, padding="same", name="conv0")(x)
 
     for b in range(blocks):
-        x = discriminator_block(x, filters * 2 ** (b + 1), name='block' + str(b + 1) + '_')
+        x = discriminator_block(
+            x, filters * 2 ** (b + 1), name="block" + str(b + 1) + "_"
+        )
 
-    x = tfkl.ReLU(name='act')(x)
-    x = tfkl.GlobalAveragePooling2D(name='gap')(x)
-    x = tfkl.Dense(1, name='output')(x)
+    x = tfkl.ReLU(name="act")(x)
+    x = tfkl.GlobalAveragePooling2D(name="gap")(x)
+    x = tfkl.Dense(1, name="output")(x)
 
     discriminator = tfk.Model(inputs=input_layer, outputs=x, name="Discriminator")
     return discriminator
 
 
 class ConditionalHingeGAN(tfk.Model):
-    def __init__(self, discriminator, generator, latent_dim, num_classes, discriminator_rounds=1):
+    def __init__(
+        self, discriminator, generator, latent_dim, num_classes, discriminator_rounds=1
+    ):
         super(ConditionalHingeGAN, self).__init__()
         self.discriminator = discriminator
         self.generator = generator
@@ -112,11 +105,7 @@ class ConditionalHingeGAN(tfk.Model):
 
     @property
     def metrics(self):
-        return [
-            self.loss_tracker,
-            self.d_loss_tracker,
-            self.g_loss_tracker
-        ]
+        return [self.loss_tracker, self.d_loss_tracker, self.g_loss_tracker]
 
     def call(self, inputs, training=False):
         return self.generator(inputs)
@@ -128,15 +117,21 @@ class ConditionalHingeGAN(tfk.Model):
         image_size = tf.shape(real_samples)[1]
 
         image_one_hot_labels = one_hot_labels[:, :, None, None]
-        image_one_hot_labels = tf.repeat(image_one_hot_labels, repeats=[image_size * image_size])
-        image_one_hot_labels = tf.reshape(image_one_hot_labels, (-1, image_size, image_size, self.num_classes))
+        image_one_hot_labels = tf.repeat(
+            image_one_hot_labels, repeats=[image_size * image_size]
+        )
+        image_one_hot_labels = tf.reshape(
+            image_one_hot_labels, (-1, image_size, image_size, self.num_classes)
+        )
 
         for i in range(self.discriminator_rounds):
             z = tf.random.normal(shape=(batch_size, self.latent_dim))
             generator_input = tf.concat([z, one_hot_labels], axis=-1)
             generated_samples = self.generator(generator_input, training=True)
 
-            double_labels = tf.concat([image_one_hot_labels, image_one_hot_labels], axis=0)
+            double_labels = tf.concat(
+                [image_one_hot_labels, image_one_hot_labels], axis=0
+            )
             combined_samples = tf.concat([generated_samples, real_samples], axis=0)
             discriminator_input = tf.concat([combined_samples, double_labels], axis=-1)
 
@@ -146,7 +141,9 @@ class ConditionalHingeGAN(tfk.Model):
                 D_fake, D_real = tf.split(predictions, [batch_size, batch_size], axis=0)
                 d_loss = self.loss_hinge_dis(D_fake, D_real)
             grads = tape.gradient(d_loss, self.discriminator.trainable_weights)
-            self.d_optimizer.apply_gradients(zip(grads, self.discriminator.trainable_weights))
+            self.d_optimizer.apply_gradients(
+                zip(grads, self.discriminator.trainable_weights)
+            )
 
         loss = d_loss
 
@@ -157,8 +154,12 @@ class ConditionalHingeGAN(tfk.Model):
         # Train the generator
         with tf.GradientTape() as tape:
             generated_samples = self.generator(generator_input, training=True)
-            discriminator_input = tf.concat([generated_samples, image_one_hot_labels], axis=-1)
-            misleading_predictions = self.discriminator(discriminator_input, training=True)
+            discriminator_input = tf.concat(
+                [generated_samples, image_one_hot_labels], axis=-1
+            )
+            misleading_predictions = self.discriminator(
+                discriminator_input, training=True
+            )
             g_loss = self.loss_hinge_gen(misleading_predictions)
         grads = tape.gradient(g_loss, self.generator.trainable_weights)
         self.g_optimizer.apply_gradients(zip(grads, self.generator.trainable_weights))
@@ -177,13 +178,15 @@ class ConditionalHingeGAN(tfk.Model):
 
 
 class ConditionalGANMonitor(tfk.callbacks.Callback):
-    def __init__(self, num_img, num_classes, latent_dim, name='', gray=False):
+    def __init__(self, num_img, num_classes, latent_dim, name="", gray=False):
         self.num_img = num_img
         self.latent_dim = latent_dim
         self.name = name
         self.gray = gray
         self.noise = tf.random.normal(shape=(self.num_img, self.latent_dim))
-        self.labels = tfk.utils.to_categorical(tf.math.floormod(tf.range(0, self.num_img), num_classes))
+        self.labels = tfk.utils.to_categorical(
+            tf.math.floormod(tf.range(0, self.num_img), num_classes)
+        )
 
     def on_epoch_end(self, epoch, logs=None):
         generator_input = tf.concat([self.noise, self.labels], axis=-1)
@@ -194,7 +197,7 @@ class ConditionalGANMonitor(tfk.callbacks.Callback):
             img = tfk.preprocessing.image.array_to_img((generated_images[i] + 1) / 2)
             ax = axes[i % self.num_img]
             if self.gray:
-                ax.imshow(np.squeeze(img), cmap='gray')
+                ax.imshow(np.squeeze(img), cmap="gray")
             else:
                 ax.imshow(np.squeeze(img))
         plt.tight_layout()

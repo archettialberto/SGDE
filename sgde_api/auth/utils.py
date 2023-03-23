@@ -7,8 +7,14 @@ from jose import jwt, JWTError
 from pydantic import Field
 from sqlalchemy.orm import Session
 
-from sgde_api.auth.exceptions import EmailTaken, UsernameTaken, UserNotFound, InvalidToken, LoginRequired, \
-    InvalidCredentials
+from sgde_api.auth.exceptions import (
+    EmailTaken,
+    UsernameTaken,
+    UserNotFound,
+    InvalidToken,
+    LoginRequired,
+    InvalidCredentials,
+)
 from schemas import UserCreate, UserBase, SGDEBaseModel
 from sgde_api.config import settings
 from sgde_api.database import UserTable, get_db
@@ -58,9 +64,7 @@ def create_user(db: Session, user: UserCreate) -> UserDB:
         raise EmailTaken()
     hashed_password = get_password_hash(user.password)
     db_user = UserTable(
-        username=user.username,
-        email=user.email,
-        hashed_password=hashed_password
+        username=user.username, email=user.email, hashed_password=hashed_password
     )
     db.add(db_user)
     db.commit()
@@ -68,11 +72,10 @@ def create_user(db: Session, user: UserCreate) -> UserDB:
     return db_user
 
 
-def create_access_token(user: UserDB, expires_delta: timedelta = timedelta(minutes=settings.JWT_EXP)):
-    jwt_data = {
-        "sub": user.username,
-        "exp": datetime.utcnow() + expires_delta
-    }
+def create_access_token(
+    user: UserDB, expires_delta: timedelta = timedelta(minutes=settings.JWT_EXP)
+):
+    jwt_data = {"sub": user.username, "exp": datetime.utcnow() + expires_delta}
     return jwt.encode(jwt_data, settings.JWT_SECRET, algorithm=settings.JWT_ALG)
 
 
@@ -90,7 +93,9 @@ def parse_jwt_user_data(token: str = Depends(oauth2_scheme)) -> JWTData | None:
     return JWTData(**payload)
 
 
-def parse_jwt_user_data_required(token: JWTData | None = Depends(parse_jwt_user_data)) -> JWTData:
+def parse_jwt_user_data_required(
+    token: JWTData | None = Depends(parse_jwt_user_data),
+) -> JWTData:
     if not token:
         raise LoginRequired()
     return token
@@ -110,11 +115,16 @@ class Token(SGDEBaseModel):
     token_type: str = "bearer"
 
 
-def create_access_token_for_auth_user(db: Session, username: str, password: str) -> Token:
+def create_access_token_for_auth_user(
+    db: Session, username: str, password: str
+) -> Token:
     user = authenticate_user(db, username, password)
     access_token = create_access_token(user)
     return Token(access_token=access_token)
 
 
-def get_current_user(db: Session = Depends(get_db), token: JWTData = Depends(parse_jwt_user_data_required)) -> UserDB:
+def get_current_user(
+    db: Session = Depends(get_db),
+    token: JWTData = Depends(parse_jwt_user_data_required),
+) -> UserDB:
     return get_user_by_username_required(db=db, username=token.username)

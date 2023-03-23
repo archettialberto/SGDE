@@ -20,4 +20,6 @@ class MissingAuthorization(ClientException):
 
 class ServerUnreachable(ClientException):
     def __init__(self):
-        super(ServerUnreachable, self).__init__(f"Server unreachable ({settings.API_IP}:{settings.API_PORT})")
+        super(ServerUnreachable, self).__init__(
+            f"Server unreachable ({settings.API_IP}:{settings.API_PORT})"
+        )

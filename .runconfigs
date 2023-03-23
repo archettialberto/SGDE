@@ -1,6 +1,6 @@
 # NVIDIA-Docker run options
 # docker_args: -v /homeRAID/datasets/mydataset:/data -e PYTHONPATH=/exp
-docker_args: -p 8910:8888 -v
+docker_args: -p 8999:8888
 
 container_name: {user}_SGDE_GPU{args.gpu}_{date}
 image_name: archetti/sgde_client:0
