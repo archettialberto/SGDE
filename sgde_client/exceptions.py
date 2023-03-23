@@ -1,4 +1,4 @@
-from sgde_client.config import settings
+from sgde_client import settings
 
 
 class ClientException(Exception):

@@ -17,6 +17,7 @@ def metadata_extraction(
     X,
     y=np.array([]),
     epochs=500,
+    classifier_epochs=100,
     batch_size=128,
     image_size=32,
     model_size="small",
@@ -25,6 +26,7 @@ def metadata_extraction(
     data_description="",
     dataset_name="",
     data_format="image",
+    verbose=1,
 ):
     metadata = {}
 
@@ -66,6 +68,7 @@ def metadata_extraction(
     # GENERATIVE MODEL
     metadata["model_size"] = model_size
     metadata["epochs"] = epochs
+    metadata["classifier_epochs"] = classifier_epochs
     metadata["batch_size"] = batch_size
 
     metadata["discriminator_rounds"] = 3
@@ -90,13 +93,14 @@ def metadata_extraction(
     return metadata
 
 
-def data_processing(metadata, data, labels=np.array([])):
+def data_processing(metadata, data, labels=np.array([]), verbose=2):
     # Make the image dataset with 4 dimensions
     if len(metadata["raw_shape"]) == 3 and metadata["data_format"] == "image":
         data = np.expand_dims(data, axis=-1)
 
     # Make the image dataset squared
-    print("\t Dataset reshaping started...")
+    if verbose > 1:
+        print("\t Dataset reshaping started...")
     dim = min(data.shape[1:-1])
     data = data[
         :,
@@ -104,27 +108,35 @@ def data_processing(metadata, data, labels=np.array([])):
         (data.shape[2] - dim) // 2 : (data.shape[2] + dim) // 2,
         :,
     ]
-    print("\t Dataset reshaping completed!")
+    if verbose > 1:
+        print("\t Dataset reshaping completed!")
 
     # Resize the image dataset
-    print("\t Dataset resizing started...")
+    if verbose > 1:
+        print("\t Dataset resizing started...")
     resize = tfkl.Resizing(metadata["shape"][1], metadata["shape"][2])
     data = resize(data).numpy()
-    print("\t Dataset resizing completed!")
+    if verbose > 1:
+        print("\t Dataset resizing completed!")
 
     # Save data minimum and maximum
     metadata["data_min"] = data.min()
     metadata["data_max"] = data.max()
 
     # Normalize in range [-1,1]
-    print("\t Dataset normalization started...")
+    if verbose > 1:
+        print("\t Dataset normalization started...")
     data = (
         (data - metadata["data_min"])
         / (metadata["data_max"] - metadata["data_min"])
         * 2
         - 1
     ).astype(np.float32)
-    print("\t Dataset normalization completed!")
+    if verbose > 1:
+        print("\t Dataset normalization completed!")
+    """
+    da verificare, perché ci mette tanto tempo...
+    """
 
     if labels.size != 0:
         labels = tfk.utils.to_categorical(labels)

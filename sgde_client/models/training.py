@@ -23,8 +23,9 @@ def train_image_generator(
     name: str,
     description: str,
     X: np.array,
-    y: np.array = None,
+    y: np.array = np.array([]),
     epochs: int = 500,
+    classifier_epochs: int = 100,
     batch_size: int = 128,
     image_size: int = 32,
     model_size: str = "",
@@ -33,7 +34,6 @@ def train_image_generator(
     data_description: str = "",
     dataset_name: str = "",
     verbose: int = 1,
-    classification_epochs=100,
     path: str = None,
 ):
     # Extract metadata
@@ -43,6 +43,7 @@ def train_image_generator(
         X=X,
         y=y,
         epochs=epochs,
+        classifier_epochs=classifier_epochs,
         batch_size=batch_size,
         image_size=image_size,
         model_size=model_size,
@@ -51,6 +52,7 @@ def train_image_generator(
         data_description=data_description,
         dataset_name=dataset_name,
         data_format="image",
+        verbose=verbose,
     )
     metadata["name"] = name
     metadata["description"] = description
@@ -63,7 +65,7 @@ def train_image_generator(
         print("Data processing started...")
     X, y = data_processing(metadata, X, y)
     X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.1, stratify=np.argmax(y, axis=1)
+        X, y, random_state=42, test_size=0.1, stratify=np.argmax(y, axis=1)
     )
 
     dataset_train = tf.data.Dataset.from_tensor_slices((X_train, y_train))
@@ -79,7 +81,6 @@ def train_image_generator(
     # Train a classifier on real data
     if verbose > 0:
         print("Classifier training on real data started...")
-
     real_classifier = build_resnet18(
         metadata["generator_output_shape"][1:], metadata["num_classes"]
     )
@@ -87,7 +88,7 @@ def train_image_generator(
         dataset_train,
         validation_data=dataset_test,
         batch_size=128,
-        epochs=classification_epochs,
+        epochs=metadata["classifier_epochs"],
         verbose=2,
         callbacks=[tfk.callbacks.LearningRateScheduler(scheduler)],
     ).history
@@ -95,7 +96,6 @@ def train_image_generator(
     metadata["classifier_real_best_accuracy"] = max(
         metadata["classifier_real_history"]["val_accuracy"]
     )
-
     if verbose > 0:
         print("Classifier training on real data completed!")
 
@@ -140,7 +140,6 @@ def train_image_generator(
     # Train the generator
     if verbose > 0:
         print("Generator training started...")
-
     metadata["history"] = gan.fit(
         dataset_train,
         batch_size=metadata["batch_size"],
@@ -148,15 +147,12 @@ def train_image_generator(
         verbose=2,
         callbacks=cb,
     ).history
-
     if verbose > 0:
         print("Generator training completed!")
 
     # Save the generator
     if verbose > 0:
         print("Generator saving started...")
-    # gan.generator.save('gan_gen_prova')
-    # gan.discriminator.save('gan_disc_prova')
 
     if path is None:
         path = os.path.join(
@@ -204,7 +200,30 @@ def train_image_generator(
     generated_mean = np.expand_dims(np.mean(temp_generated_samples, axis=0), axis=0)
     temp_real_samples = ((X_train + 1) / 2 * 255).astype(np.int32)
     real_mean = np.expand_dims(np.mean(temp_real_samples, axis=0), axis=0)
+
+    # Structural Similarity Index Measure (SSIM) is between 0 and 1, the higher the better
     metadata["SSIM"] = tf.image.ssim(generated_mean, real_mean, max_val=255)
+
+    argmax_labels = tf.math.argmax(labels, axis=-1)
+    argmax_y = tf.math.argmax(y_train, axis=-1)
+    metadata["Averaged_SSIM"] = 0
+
+    for i in metadata["classes"]:
+        temp_generated_samples_class_i = temp_generated_samples[
+            argmax_labels == (i).astype("float32")
+        ]
+        generated_mean_class_i = np.expand_dims(
+            np.mean(temp_generated_samples_class_i, axis=0), axis=0
+        )
+        temp_real_samples_class_i = temp_real_samples[argmax_y == (i).astype("float32")]
+        real_mean_class_i = np.expand_dims(
+            np.mean(temp_real_samples_class_i, axis=0), axis=0
+        )
+        metadata["Averaged_SSIM"] += tf.image.ssim(
+            generated_mean_class_i, real_mean_class_i, max_val=255
+        )
+    metadata["Averaged_SSIM"] /= metadata["num_classes"]
+
     if verbose > 0:
         print("Similarity metrics computation completed!")
 
@@ -215,10 +234,10 @@ def train_image_generator(
         metadata["generator_output_shape"][1:], metadata["num_classes"]
     )
     metadata["classifier_gen_history"] = gen_classifier.fit(
-        dataset_train,
+        dataset_gen,
         validation_data=dataset_test,
         batch_size=128,
-        epochs=classification_epochs,
+        epochs=metadata["classifier_epochs"],
         verbose=2,
         callbacks=[tfk.callbacks.LearningRateScheduler(scheduler)],
     ).history

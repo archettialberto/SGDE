@@ -1,5 +1,4 @@
 import functools
-import logging
 import os
 from json import JSONDecodeError
 
@@ -10,7 +9,7 @@ from sgde_client.exceptions import (
     MissingAuthorization,
     ServerUnreachable,
 )
-from sgde_client.config import settings
+from sgde_client import settings, logger
 
 
 def send_request(method: str, authenticate: bool = False):
@@ -35,7 +34,8 @@ def send_request(method: str, authenticate: bool = False):
                 payload["headers"]["Authorization"] = f"Bearer {token}"
 
             url = f"http://{settings.API_IP}:{settings.API_PORT}/{uri}"
-            logging.info(f"Sending {method} request to {url}")
+            if settings.DEBUG_MODE:
+                logger.info(f"Sending {method} request to {url}")
             try:
                 resp = request_fn(url, **payload)
             except requests.ConnectionError:
@@ -45,12 +45,15 @@ def send_request(method: str, authenticate: bool = False):
                 try:
                     raise ResponseException(resp.status_code, str(resp.json()))
                 except JSONDecodeError:
-                    raise ResponseException(resp.status_code, "Cannot decode JSON response")
+                    raise ResponseException(
+                        resp.status_code, "Cannot decode JSON response"
+                    )
 
-            try:
-                logging.info(f"[{resp.status_code}] {resp.json()}")
-            except JSONDecodeError:
-                logging.info(f"[{resp.status_code}]")
+            if settings.DEBUG_MODE:
+                try:
+                    logger.info(f"Received {resp.status_code}, {resp.json()}")
+                except JSONDecodeError:
+                    logger.warning(f"Received {resp.status_code}, but cannot decode JSON response")
             return resp
 
         return wrapped_fn

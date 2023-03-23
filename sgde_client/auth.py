@@ -4,6 +4,7 @@ from getpass import getpass
 import pandas as pd
 
 from schemas import UserCreate, User
+from sgde_client import logger
 from sgde_client.utils import post_request, get_request
 
 
@@ -22,7 +23,7 @@ def register_request():
 def register() -> User:
     response = register_request()
     user = User(**response.json())
-    print(f"Registered as {user.username} ({user.email})")
+    logger.info(f"Registered as {user.username} ({user.email})")
     return user
 
 
@@ -36,7 +37,7 @@ def token_request():
 def login():
     response = token_request()
     os.environ["ACCESS_TOKEN"] = response.json()["access_token"]
-    print(f"Successfully logged in")
+    logger.info(f"Successfully logged in")
 
 
 @get_request(authenticate=True)
@@ -47,7 +48,7 @@ def whoami_request():
 def whoami() -> User:
     response = whoami_request()
     user = User(**response.json())
-    print(f"Logged in as {user.username} ({user.email})")
+    logger.info(f"Logged in as {user.username} ({user.email})")
     return user
 
 

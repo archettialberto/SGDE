@@ -4,6 +4,7 @@ from datetime import datetime
 import pandas as pd
 
 from schemas import Generator, GeneratorCreate
+from sgde_client import logger
 from sgde_client.utils import get_request, post_request
 
 
@@ -41,7 +42,7 @@ def download_generator(generator_name: str, path: str = None) -> str:
         path = os.path.join(path, filename)
     with open(path, "wb") as f:
         f.write(response.content)
-    print(f"Generator downloaded at {path}")
+    logger.info(f"Generator downloaded at {path}")
     return path
 
 
@@ -55,5 +56,5 @@ def upload_generator_request(path: str, metadata: GeneratorCreate):
 def upload_generator(path: str, metadata: GeneratorCreate) -> Generator:
     response = upload_generator_request(path=path, metadata=metadata)
     generator = Generator(**response.json())
-    print(f"Generator uploaded as {response.json()['name']}")
+    logger.info(f"Generator uploaded as {response.json()['name']}")
     return generator
