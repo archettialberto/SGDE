@@ -8,7 +8,6 @@ import tensorflow.keras as tfk
 import tf2onnx
 from sklearn.model_selection import train_test_split
 
-from schemas import GeneratorCreate
 from sgde_client.models.classifiers import build_resnet18
 from sgde_client.models.generators import (
     ConditionalHingeGAN,
@@ -56,7 +55,6 @@ def train_image_generator(
     )
     metadata["name"] = name
     metadata["description"] = description
-    parsed_metadata = GeneratorCreate(**metadata)
     if verbose > 0:
         print("Metadata extraction completed!")
 
@@ -160,10 +158,10 @@ def train_image_generator(
         )
 
     model_proto, _ = tf2onnx.convert.from_keras(
-        gan,
+        gan.generator,
         input_signature=(
             tf.TensorSpec(
-                (None, metadata["generator_input_shape"]), tf.float32, name="input"
+                (None, metadata["generator_input_shape"]), tf.float32, name="z"
             ),
         ),
         opset=13,
@@ -248,4 +246,4 @@ def train_image_generator(
     if verbose > 0:
         print("Classifier training on generated data completed!")
 
-    return path, metadata, parsed_metadata
+    return path, metadata
