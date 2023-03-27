@@ -1,16 +1,13 @@
 FROM python:3.10.9-slim-buster
 
-WORKDIR /src
-
 RUN apt-get update && apt clean
 
-COPY ./sgde_api/docker/requirements.txt /tmp/requirements.txt
+COPY sgde_api/docker/requirements.txt /tmp/requirements.txt
 
 RUN pip install -U --upgrade pip
 RUN pip install -r /tmp/requirements.txt
 
-COPY ./schemas.py /src
-COPY ./sgde_api /src/sgde_api
+WORKDIR /src
 
 EXPOSE 8000
 
