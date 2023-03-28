@@ -13,12 +13,12 @@ class SGDEBaseModel(BaseModel):
         use_enum_values = True
 
 
-GENERATOR_NAME_PATTERN = re.compile(r"^[a-zA-Z][a-zA-Z0-9_-]$")
+GENERATOR_NAME_PATTERN = re.compile(r"^[a-zA-Z][a-zA-Z0-9_-]*$")
 VALID_GENERATOR_NAME = (
     "Generator name must contain characters, digits, and dashes;"
     "generator name must start with a character"
 )
-USERNAME_PATTERN = re.compile(r"^[a-zA-Z][a-zA-Z0-9_-]$")
+USERNAME_PATTERN = re.compile(r"^[a-zA-Z][a-zA-Z0-9_-]*$")
 VALID_USERNAME = (
     "Username must contain characters, digits, and dashes;"
     "username must start with a character"
