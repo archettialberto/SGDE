@@ -73,6 +73,6 @@ else:
             st.download_button(
                 label=":arrow_down:",
                 on_click=on_clock_download,
-                args=(sorted_df.loc[i, 'name']),
+                args=(sorted_df.loc[i, "name"]),
                 data=st.session_state["onnx_cache"],
             )

@@ -53,7 +53,9 @@ def send_request(method: str, authenticate: bool = False):
                 try:
                     logger.info(f"Received {resp.status_code}, {resp.json()}")
                 except JSONDecodeError:
-                    logger.warning(f"Received {resp.status_code}, but cannot decode JSON response")
+                    logger.warning(
+                        f"Received {resp.status_code}, but cannot decode JSON response"
+                    )
             return resp
 
         return wrapped_fn

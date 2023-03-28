@@ -53,8 +53,34 @@ def upload_generator_request(path: str, metadata: GeneratorCreate):
     return f"exchange/upload", {"data": metadata.dict(), "files": {"onnx_file": onnx}}
 
 
-def upload_generator(path: str, metadata: GeneratorCreate) -> Generator:
-    response = upload_generator_request(path=path, metadata=metadata)
+def preprocess_metadata(metadata: dict) -> GeneratorCreate:
+    return GeneratorCreate(
+        name=metadata["name"],
+        description=metadata["description"],
+        dataset_name=metadata["dataset_name"],
+        dataset_description=metadata["data_description"],
+        format=metadata["data_format"],
+        image_size=metadata["image_size"],
+        conditioned=metadata["conditioned"],
+        task=metadata["task"],
+        num_classes=metadata["num_classes"],
+        model_size=metadata["model_size"],
+        generator_epochs=metadata["epochs"],
+        generator_batch_size=metadata["batch_size"],
+        classifier_epochs=metadata["classifier_epochs"],
+        classifier_batch_size=metadata["batch_size"],
+        discriminator_rounds=metadata["discriminator_rounds"],
+        generator_input_shape=metadata["generator_input_shape"],
+        classifier_gen_best_accuracy=metadata["classifier_gen_best_accuracy"],
+        classifier_real_best_accuracy=metadata["classifier_real_best_accuracy"],
+        ssim=metadata["SSIM"].numpy().astype(float).item(),
+        avg_ssim=metadata["Averaged_SSIM"].numpy().astype(float).item(),
+    )
+
+
+def upload_generator(path: str, metadata: dict) -> Generator:
+    parsed_metadata = preprocess_metadata(metadata)
+    response = upload_generator_request(path=path, metadata=parsed_metadata)
     generator = Generator(**response.json())
     logger.info(f"Generator uploaded as {response.json()['name']}")
     return generator
