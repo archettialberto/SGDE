@@ -37,6 +37,7 @@ def metadata_extraction(
     metadata["raw_shape"] = X.shape
 
     if metadata["data_format"] == "image":
+        metadata["image_size"] = image_size
         if len(X.shape) > 4 or len(X.shape) < 3:
             print(f"ABORT: {X.shape} is not a proper shape for an image dataset")
             return -1
