@@ -9,6 +9,9 @@ RUN pip install -r /tmp/requirements.txt
 
 WORKDIR /src
 
+COPY sgde_api /src/sgde_api
+COPY schemas.py /src/schemas.py
+
 EXPOSE 8000
 
 CMD ["uvicorn", "sgde_api.main:app", "--host", "0.0.0.0", "--port", "8000"]

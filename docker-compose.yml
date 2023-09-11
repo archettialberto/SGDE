@@ -11,35 +11,14 @@ services:
     image: ai-sprint-sgde/sgde-api:0
     env_file:
       - .api.env
-    # environment:
-    #   - POSTGRES_USER=app
     networks:
       sgde_network:
         aliases:
           - sgde_api
     build:
-      context: sgde_api
-      dockerfile: sgde_api/Dockerfile
+      context: .
+      dockerfile: sgde_api/docker/Dockerfile
     volumes:
-      - ./sgde_api:/src/sgde_api
-      - ./schemas.py:/src/schemas.py
+        - ./instance:/instance
     ports:
       - "8000:8000"
-
-  sgde-frontend:
-    container_name: sgde-frontend-container
-    image: ai-sprint-sgde/sgde-frontend:0
-    build:
-      context: sgde_frontend
-      dockerfile: sgde_frontend/Dockerfile
-    volumes:
-      - ./sgde_frontend:/src/sgde_frontend
-      - ./schemas.py:/src/schemas.py
-    networks:
-      sgde_network:
-        aliases:
-          - sgde_frontend
-    ports:
-      - "8501:8501"
-    depends_on:
-      - sgde-api
