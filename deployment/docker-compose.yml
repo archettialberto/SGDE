@@ -1,0 +1,24 @@
+version: '3.7'
+
+networks:
+  sgde_network:
+    external: false
+    name: sgde_network
+
+services:
+  sgde-api:
+    container_name: sgde-api-container
+    image: aarchetti/sgde-api:latest
+    env_file:
+      - .api.env
+    networks:
+      sgde_network:
+        aliases:
+          - sgde_api
+    build:
+      context: .
+      dockerfile: sgde_api/docker/Dockerfile
+    volumes:
+        - ./instance:/instance
+    ports:
+      - "8000:8000"
