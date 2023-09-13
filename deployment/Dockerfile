@@ -2,7 +2,7 @@ FROM python:3.10.9-slim-buster
 
 RUN apt-get update && apt clean
 
-COPY sgde_api/docker/requirements.txt /tmp/requirements.txt
+COPY requirements.txt /tmp/requirements.txt
 
 RUN pip install -U --upgrade pip
 RUN pip install -r /tmp/requirements.txt
