@@ -23,7 +23,7 @@ A detailed documentation of the SGDE API and Client can be found in the followin
 * [SGDE Client Documentation](https://github.com/archettialberto/SGDE/blob/main/sgde_client/README.md)
 
 
-## References
+## 📚 References
 
 - [SGDE Paper](https://arxiv.org/abs/2109.12062)
 - [AI-SPRINT](https://www.ai-sprint-project.eu/)
