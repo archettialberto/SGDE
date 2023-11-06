@@ -14,13 +14,13 @@ SGDE is part of the [AI-SPRINT](https://www.ai-sprint-project.eu/) project, wher
 
 ## 🚀 Demo
 
-An example usage of SGDE can be found [here](https://gitlab.polimi.it/ai-sprint/sgde/-/blob/main/sgde_demo.ipynb).
+An example usage of SGDE can be found [here](https://github.com/archettialberto/AI-SPRINT-SGDE/blob/main/sgde_demo.ipynb).
 
 ## 📖 Documentation
 
 A detailed documentation of the SGDE API and Client can be found in the following links:
-* [SGDE API Documentation](https://gitlab.polimi.it/ai-sprint/sgde/-/blob/main/sgde_api/README.md)
-* [SGDE Client Documentation](https://gitlab.polimi.it/ai-sprint/sgde/-/blob/main/sgde_client/README.md)
+* [SGDE API Documentation](https://github.com/archettialberto/AI-SPRINT-SGDE/blob/main/sgde_api/README.md)
+* [SGDE Client Documentation](https://github.com/archettialberto/AI-SPRINT-SGDE/blob/main/sgde_client/README.md)
 
 
 ## References
