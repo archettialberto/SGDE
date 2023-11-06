@@ -10,9 +10,9 @@ For more information about SGDE, please refer to the [SGDE Paper](https://arxiv.
 ## ⚙️ Installation
 
 The Dockerfile collecting the recipe to install the
-minimum [requirements](https://github.com/archettialberto/AI-SPRINT-SGDE/blob/main/sgde_client/docker/requirements.txt?ref_type=heads)
+minimum [requirements](https://github.com/archettialberto/SGDE/blob/main/sgde_client/docker/requirements.txt?ref_type=heads)
 of the client component is
-available [here](https://github.com/archettialberto/AI-SPRINT-SGDE/blob/main/sgde_client/docker/Dockerfile?ref_type=heads)
+available [here](https://github.com/archettialberto/SGDE/blob/main/sgde_client/docker/Dockerfile?ref_type=heads)
 .
 
 ## 🛠️ Environment variables
