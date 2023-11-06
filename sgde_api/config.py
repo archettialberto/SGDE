@@ -23,6 +23,10 @@ class Environment(str, Enum):
 
 
 class Config(BaseSettings):
+    """
+    Class for the SGDE API configuration.
+    """
+
     INSTANCE_PATH = os.path.join(os.getcwd(), "instance")
     DATABASE_URL: str = f"sqlite:///{os.path.join(INSTANCE_PATH, 'sgde_db.db')}"
 

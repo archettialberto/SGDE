@@ -3,8 +3,8 @@ from getpass import getpass
 
 import pandas as pd
 
-from schemas import UserCreate, User
-from sgde_client import logger
+from sgde_client.config import logger
+from sgde_utils.schemas import UserCreate, User
 from sgde_client.utils import post_request, get_request
 
 
@@ -53,12 +53,12 @@ def whoami() -> User:
 
 
 @get_request()
-def get_users_request(skip: int = 0, limit: int = 10):
-    return f"users/?skip={skip}&limit={limit}", {}
+def get_users_request():
+    return f"users", {}
 
 
-def get_users(skip: int = 0, limit: int = 10) -> pd.DataFrame:
-    response = get_users_request(skip=skip, limit=limit)
+def get_users() -> pd.DataFrame:
+    response = get_users_request()
     return pd.DataFrame(response.json())
 
 

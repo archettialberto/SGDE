@@ -9,10 +9,16 @@ from sgde_client.exceptions import (
     MissingAuthorization,
     ServerUnreachable,
 )
-from sgde_client import settings, logger
+from sgde_client.config import settings, logger
 
 
 def send_request(method: str, authenticate: bool = False):
+    """
+    Decorator for sending requests to the API.
+    :param method: GET or POST
+    :param authenticate: Whether to authenticate the request
+    """
+
     def decorator_fn(fn):
         @functools.wraps(fn)
         def wrapped_fn(*args, **kwargs):
@@ -64,8 +70,16 @@ def send_request(method: str, authenticate: bool = False):
 
 
 def get_request(authenticate: bool = False):
+    """
+    Decorator for sending GET requests to the API.
+    :param authenticate: Whether to authenticate the request
+    """
     return send_request(method="GET", authenticate=authenticate)
 
 
 def post_request(authenticate: bool = False):
+    """
+    Decorator for sending POST requests to the API.
+    :param authenticate: Whether to authenticate the request
+    """
     return send_request(method="POST", authenticate=authenticate)

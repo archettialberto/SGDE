@@ -8,7 +8,7 @@ networks:
 services:
   sgde-api:
     container_name: sgde-api-container
-    image: ai-sprint-sgde/sgde-api:0
+    image: ai-sprint/sgde:latest
     env_file:
       - .api.env
     networks:

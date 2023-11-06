@@ -1,3 +1,4 @@
+import json
 import os
 import shutil
 
@@ -25,6 +26,20 @@ engine = create_engine(
     connect_args={"check_same_thread": False},
 )
 SessionTesting = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+foobar = {"username": "foobar", "email": "foobar@example.com", "password": "aaaAAA1!"}
+
+foo_gan = {
+    "name": "foo_gan",
+    "data_name": "mnist",
+    "data_description": "MNIST dataset",
+    "data_structure": "image",
+    "data_length": 60000,
+    "task": "classification",
+    "metric": "accuracy",
+    "best_score": 0.97,
+    "best_score_real": 0.98,
+}
 
 
 def start_application() -> FastAPI:
@@ -75,8 +90,8 @@ def client(app, db_session):
             pass
 
     app.dependency_overrides[get_db] = _get_test_db
-    with TestClient(app) as client:
-        yield client
+    with TestClient(app) as fixture_client:
+        yield fixture_client
 
 
 @pytest.fixture(scope="module")
@@ -84,13 +99,13 @@ def onnx_file():
     onnx_folder = os.path.join(os.getcwd(), "test_onnx")
     os.makedirs(onnx_folder, exist_ok=True)
 
-    X = make_tensor_value_info("X", TensorProto.FLOAT, [None, None])
-    A = make_tensor_value_info("A", TensorProto.FLOAT, [None, None])
-    B = make_tensor_value_info("B", TensorProto.FLOAT, [None, None])
-    Y = make_tensor_value_info("Y", TensorProto.FLOAT, [None])
+    _X = make_tensor_value_info("X", TensorProto.FLOAT, [None, None])
+    _A = make_tensor_value_info("A", TensorProto.FLOAT, [None, None])
+    _B = make_tensor_value_info("B", TensorProto.FLOAT, [None, None])
+    _Y = make_tensor_value_info("Y", TensorProto.FLOAT, [None])
     node1 = make_node("MatMul", ["X", "A"], ["XA"])
     node2 = make_node("Add", ["XA", "B"], ["Y"])
-    graph = make_graph([node1, node2], "lr", [X, A, B], [Y])
+    graph = make_graph([node1, node2], "lr", [_X, _A, _B], [_Y])
     onnx_model = make_model(graph)
     check_model(onnx_model)
 
@@ -110,3 +125,36 @@ def onnx_file():
 
     yield ONNXFileBearer()
     shutil.rmtree(onnx_folder)
+
+
+@pytest.fixture(scope="module")
+def json_file():
+    json_folder = os.path.join(os.getcwd(), "test_json")
+    os.makedirs(json_folder, exist_ok=True)
+
+    with open(os.path.join(json_folder, "json_model.json"), "w") as f:
+        json.dump(foo_gan, f)
+
+    with open(os.path.join(json_folder, "wrong_json_model.json"), "w") as f:
+        json.dump({"list_of_list": [[]]}, f)
+
+    class JSONFileBearer:
+        def __init__(self):
+            with open(os.path.join(json_folder, "json_model.json"), "r") as f:
+                self.well_formatted = f.read()
+
+            with open(os.path.join(json_folder, "wrong_json_model.json"), "r") as f:
+                self.corrupted = f.read()
+
+    yield JSONFileBearer()
+    shutil.rmtree(json_folder)
+
+
+def register_and_login(fixture_client):
+    fixture_client.post("/auth/register", json=foobar)
+    response = fixture_client.post(
+        "/auth/token",
+        data={"username": foobar["username"], "password": foobar["password"]},
+    )
+    token = response.json()["access_token"]
+    return token

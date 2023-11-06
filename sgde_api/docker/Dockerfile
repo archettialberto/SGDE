@@ -10,7 +10,7 @@ RUN pip install -r /tmp/requirements.txt
 WORKDIR /src
 
 COPY sgde_api /src/sgde_api
-COPY schemas.py /src/schemas.py
+COPY sgde_utils /src/sgde_utils
 
 EXPOSE 8000
 

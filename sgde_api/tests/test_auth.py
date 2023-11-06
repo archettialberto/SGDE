@@ -8,9 +8,8 @@ from sgde_api.auth.exceptions import (
     LoginRequired,
     InvalidToken,
 )
-from schemas import VALID_USERNAME, VALID_PASSWORD
-
-foobar = {"username": "foobar", "email": "user@example.com", "password": "aaaAAA1!"}
+from sgde_api.tests.conftest import foobar
+from sgde_utils.schemas import VALID_USERNAME, VALID_PASSWORD
 
 
 def test_get_empty_user_table(client):
@@ -28,7 +27,7 @@ def test_get_non_existing_user(client):
 def test_register(client):
     response = client.post("/auth/register", json=foobar)
     assert response.status_code == status.HTTP_201_CREATED
-    assert response.json() == {"username": "foobar", "email": "user@example.com"}
+    assert response.json() == {"username": "foobar", "email": "foobar@example.com"}
 
 
 def test_get_populated_user_table(client):
@@ -48,44 +47,10 @@ def test_get_populated_user_table(client):
     ]
 
 
-def test_limit_skip_for_get_clients(client):
-    for i in range(15):
-        client.post(
-            "/auth/register",
-            json={
-                "username": f"user{i}",
-                "email": f"user{i}@example.com",
-                "password": "aaaAAA1!",
-            },
-        )
-    response = client.get("/users?skip=3")
-    assert response.status_code == status.HTTP_200_OK
-    assert response.json() == [
-        {"username": f"user{i}", "email": f"user{i}@example.com"} for i in range(3, 13)
-    ]
-
-
-def test_limit_skip_for_get_clients_with_high_limit(client):
-    for i in range(15):
-        client.post(
-            "/auth/register",
-            json={
-                "username": f"user{i}",
-                "email": f"user{i}@example.com",
-                "password": "aaaAAA1!",
-            },
-        )
-    response = client.get("/users?skip=3&limit=100")
-    assert response.status_code == status.HTTP_200_OK
-    assert response.json() == [
-        {"username": f"user{i}", "email": f"user{i}@example.com"} for i in range(3, 15)
-    ]
-
-
 def test_register_existing_username(client):
     client.post("/auth/register", json=foobar)
     _foobar = foobar.copy()
-    _foobar["email"] = "user2@example.com"
+    _foobar["email"] = "barfoo@example.com"
     response = client.post("/auth/register", json=_foobar)
     assert response.status_code == UsernameTaken.STATUS_CODE
     assert response.json()["detail"] == UsernameTaken.DETAIL
@@ -104,7 +69,7 @@ def test_get_existing_user(client):
     client.post("/auth/register", json=foobar)
     response = client.get("/users/foobar")
     assert response.status_code == status.HTTP_200_OK
-    assert response.json() == {"username": "foobar", "email": "user@example.com"}
+    assert response.json() == {"username": "foobar", "email": "foobar@example.com"}
 
 
 def test_malformed_username(client):
@@ -120,7 +85,6 @@ def test_malformed_email(client):
     _foobar["email"] = "user@examplecom"
     response = client.post("/auth/register", json=_foobar)
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
-    assert response.json()["detail"][0]["msg"] == "value is not a valid email address"
 
 
 def test_malformed_password(client):

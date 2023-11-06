@@ -1,0 +1,15 @@
+{
+  "name": "my_cnn",
+  "data_name": "MNIST",
+  "data_description": "MNIST handwritten digits",
+  "data_structure": "image",
+  "data_length": 60000,
+  "task": "classification",
+  "metric": "accuracy",
+  "best_score": 0.97,
+  "best_score_real": 0.98,
+  "a_list_of_ints": [1, 2, 3],
+  "a_list_of_floats": [1.1, 2.2, 3.3],
+  "a_list_of_strings": ["a", "b", "c"],
+  "a_list_of_stuff": [1, 2.2, "c"]
+}

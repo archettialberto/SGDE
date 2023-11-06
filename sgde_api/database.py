@@ -4,9 +4,9 @@ from sqlalchemy import (
     String,
     Integer,
     LargeBinary,
-    Boolean,
     ForeignKey,
     Float,
+    Boolean,
 )
 from sqlalchemy.orm import declarative_base, sessionmaker, relationship
 
@@ -18,6 +18,10 @@ Base = declarative_base()
 
 
 def get_db():
+    """
+    Returns a database session, closing it when the context is exited.
+    :return:
+    """
     db = SessionLocal()
     try:
         yield db
@@ -26,6 +30,10 @@ def get_db():
 
 
 class UserTable(Base):
+    """
+    Database table for the SGDE API users.
+    """
+
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, index=True)
@@ -37,30 +45,33 @@ class UserTable(Base):
 
 
 class GeneratorTable(Base):
+    """
+    Database table for the SGDE API generators.
+    """
+
     __tablename__ = "generators"
 
     id = Column(Integer, primary_key=True, index=True)
+
     name = Column(String, unique=True, index=True, nullable=False)
-    description = Column(String, nullable=False)
-    dataset_name = Column(String, index=True)
-    dataset_description = Column(String)
-    format = Column(String, index=True, nullable=False)
-    image_size = Column(Integer, index=True)
-    conditioned = Column(Boolean, index=True, nullable=False)
+
+    data_name = Column(String, index=True)
+    data_description = Column(String)
+    data_structure = Column(String, index=True)
+    data_length = Column(Integer, index=True)
+
     task = Column(String, index=True)
-    num_classes = Column(Integer, index=True)
-    model_size = Column(String, index=True, nullable=False)
-    generator_epochs = Column(Integer, index=True, nullable=False)
-    generator_batch_size = Column(Integer, index=True, nullable=False)
-    classifier_epochs = Column(Integer, index=True, nullable=False)
-    classifier_batch_size = Column(Integer, index=True, nullable=False)
-    discriminator_rounds = Column(Integer, index=True, nullable=False)
-    generator_input_shape = Column(Integer, index=True, nullable=False)
-    classifier_gen_best_accuracy = Column(Float, index=True, nullable=False)
-    classifier_real_best_accuracy = Column(Float, index=True, nullable=False)
-    ssim = Column(Float, index=True, nullable=False)
-    avg_ssim = Column(Float, index=True, nullable=False)
-    filename = Column(String, index=True, nullable=False)
+
+    metric = Column(String, index=True)
+    best_score = Column(Float, index=True)
+    best_score_real = Column(Float, index=True)
+
+    gen_onnx_file = Column(String, index=True, nullable=False)
+    cls_onnx_file = Column(String, index=True, nullable=True)
+    json_file = Column(String, index=True, nullable=False)
+
+    has_cls = Column(Boolean, index=True, nullable=False)
+
     owner = Column(String, ForeignKey("users.username"))
 
     owner_rel = relationship("UserTable", back_populates="generators_rel")
