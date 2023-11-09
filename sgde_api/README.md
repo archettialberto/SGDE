@@ -167,3 +167,24 @@ _Returns_:
 - [FastAPI](https://fastapi.tiangolo.com/)
 - [SQLAlchemy](https://www.sqlalchemy.org/)
 - [Pydantic](https://pydantic-docs.helpmanual.io/)
+
+## ✏️ How to Cite
+
+```
+@inproceedings{lomurno2023sgde,
+  author = {Lomurno, Eugenio and Archetti, Alberto and Cazzella, Lorenzo and Samele, Stefano and Di Perna, Leonardo and Matteucci, Matteo},
+  title = {SGDE: Secure Generative Data Exchange for Cross-Silo Federated Learning},
+  year = {2023},
+  isbn = {9781450396899},
+  publisher = {Association for Computing Machinery},
+  address = {New York, NY, USA},
+  url = {https://doi.org/10.1145/3573942.3573974},
+  doi = {10.1145/3573942.3573974},
+  booktitle = {Proceedings of the 2022 5th International Conference on Artificial Intelligence and Pattern Recognition},
+  pages = {205–214},
+  numpages = {10},
+  keywords = {Gradient leakage, Generative deep learning, Privacy, Differential privacy, Deep learning, Federated learning},
+  location = {Xiamen, China},
+  series = {AIPR '22}
+}
+```
